@@ -391,8 +391,8 @@
                     <div class="form-group">
                         <label for="activa">✅ Estado</label>
                         <select id="activa">
-                            <option value="true">Activa</option>
-                            <option value="false">Inactiva</option>
+                            <option value="1">Activa</option>
+                            <option value="0">Inactiva</option>
                         </select>
                     </div>
                 </div>
@@ -444,7 +444,8 @@
         const headers = {
             'apikey': SUPABASE_KEY,
             'Authorization': 'Bearer ' + SUPABASE_KEY,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation'
         };
 
         let modoEdicion = false;
@@ -472,7 +473,7 @@
                 select.innerHTML = '<option value="">Selecciona una sucursal</option>';
 
                 sucursales.forEach(suc => {
-                    select.innerHTML += `<option value="${suc.id}">${suc.nombre_sucursal} - ${suc.ciudad}</option>`;
+                    select.innerHTML += `<option value="${suc.id_sucursal}">${suc.nombre_sucursal} - ${suc.ciudad}</option>`;
                 });
 
                 console.log('✅ Sucursales cargadas:', sucursales.length);
@@ -484,16 +485,25 @@
             }
         }
 
-        // CARGAR PROMOCIONES
+        // CARGAR PROMOCIONES (SIN JOIN - porque no hay FK)
         async function cargarPromociones() {
             try {
                 showLoading(true);
                 const response = await fetch(
-                    SUPABASE_URL + '/promociones?select=*,sucursales(nombre_sucursal,ciudad)&order=created_at.desc',
+                    SUPABASE_URL + '/promociones?select=*&order=id.desc',
                     { headers: headers }
                 );
 
-                promociones = await response.json();
+                const data = await response.json();
+
+                // Verificar si es array
+                if (Array.isArray(data)) {
+                    promociones = data;
+                } else {
+                    console.error('❌ Respuesta no es array:', data);
+                    promociones = [];
+                }
+
                 renderizarPromociones();
                 actualizarEstadisticas();
 
@@ -522,9 +532,12 @@
             tableContainer.style.display = 'block';
 
             tbody.innerHTML = promociones.map(promo => {
-                const nombreSucursal = promo.sucursales?.nombre_sucursal || 'N/A';
-                const ciudadSucursal = promo.sucursales?.ciudad || '';
-                const estadoBadge = promo.activa ? 
+                // Buscar sucursal por id_sucursal
+                const sucursalData = sucursales.find(s => s.id_sucursal === promo.id_sucursal);
+                const nombreSucursal = sucursalData?.nombre_sucursal || promo.nombre_sucursal || 'N/A';
+                const ciudadSucursal = sucursalData?.ciudad || '';
+
+                const estadoBadge = promo.activa == 1 ? 
                     '<span class="badge badge-active">✓ Activa</span>' : 
                     '<span class="badge badge-inactive">✗ Inactiva</span>';
 
@@ -554,7 +567,7 @@
 
         // ACTUALIZAR ESTADÍSTICAS
         function actualizarEstadisticas() {
-            const activas = promociones.filter(p => p.activa).length;
+            const activas = promociones.filter(p => p.activa == 1).length;
             const inactivas = promociones.length - activas;
 
             document.getElementById('totalPromos').textContent = promociones.length;
@@ -570,7 +583,8 @@
                 id_sucursal: parseInt(document.getElementById('idSucursal').value),
                 descripcion: document.getElementById('descripcion').value,
                 precio: document.getElementById('precio').value || null,
-                activa: document.getElementById('activa').value === 'true'
+                activa: parseInt(document.getElementById('activa').value),
+                nombre_sucursal: sucursales.find(s => s.id_sucursal === parseInt(document.getElementById('idSucursal').value))?.nombre_sucursal || ''
             };
 
             try {
@@ -616,7 +630,7 @@
             document.getElementById('idSucursal').value = promo.id_sucursal || '';
             document.getElementById('descripcion').value = promo.descripcion || '';
             document.getElementById('precio').value = promo.precio || '';
-            document.getElementById('activa').value = promo.activa ? 'true' : 'false';
+            document.getElementById('activa').value = promo.activa || 0;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
