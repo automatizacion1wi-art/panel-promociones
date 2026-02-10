@@ -44,7 +44,6 @@
             line-height: 150%;
         }
 
-        /* SIDEBAR */
         .sidebar {
             position: fixed;
             left: 0;
@@ -100,7 +99,6 @@
             font-weight: 600;
         }
 
-        /* MAIN CONTENT */
         .main-content {
             margin-left: 260px;
             padding: 30px 40px;
@@ -144,7 +142,6 @@
             font-size: 16px;
         }
 
-        /* DASHBOARD STATS */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -216,7 +213,6 @@
             color: #f56565;
         }
 
-        /* PANEL */
         .panel {
             background: var(--white-00);
             border-radius: 8px;
@@ -244,7 +240,6 @@
             gap: 12px;
         }
 
-        /* FORM */
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -290,7 +285,6 @@
             resize: vertical;
         }
 
-        /* BUTTONS - ESTILO EXACTO DENTALINK */
         .btn {
             grid-column-gap: 8px;
             grid-row-gap: 8px;
@@ -334,7 +328,6 @@
             background: var(--blue-60);
         }
 
-        /* BOTONES DE ACCIONES - CORREGIDOS */
         .action-buttons {
             display: flex;
             gap: 8px;
@@ -381,7 +374,6 @@
             transform: translateY(-1px);
         }
 
-        /* TABLE */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -418,7 +410,6 @@
             background: var(--grey-20);
         }
 
-        /* BADGES */
         .badge {
             padding: 6px 12px;
             border-radius: 20px;
@@ -437,7 +428,6 @@
             color: #742a2a;
         }
 
-        /* FILTERS */
         .filters-bar {
             display: flex;
             gap: 15px;
@@ -462,7 +452,6 @@
             min-width: 200px;
         }
 
-        /* PAGINATION */
         .pagination {
             display: flex;
             justify-content: space-between;
@@ -519,7 +508,6 @@
             border-radius: 6px;
         }
 
-        /* ALERTS */
         .alert {
             padding: 16px 20px;
             border-radius: 6px;
@@ -558,7 +546,6 @@
             border-left: 4px solid #f56565;
         }
 
-        /* EMPTY STATE */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -571,7 +558,6 @@
             opacity: 0.5;
         }
 
-        /* LOADING */
         .loading {
             display: none;
             position: fixed;
@@ -589,7 +575,6 @@
             display: block;
         }
 
-        /* CONTENT SECTIONS */
         .content-section {
             display: none;
         }
@@ -654,7 +639,6 @@
 <body>
     <div class="loading" id="loading">⏳ Cargando...</div>
 
-    <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="logo">🦷 Dental+</div>
         <ul class="menu">
@@ -676,7 +660,6 @@
         </ul>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main class="main-content">
         <div class="top-bar">
             <h1 class="page-title" id="pageTitle">Dashboard</h1>
@@ -692,7 +675,6 @@
         <div id="alertSuccess" class="alert alert-success"></div>
         <div id="alertError" class="alert alert-error"></div>
 
-        <!-- DASHBOARD SECTION -->
         <section id="dashboard" class="content-section active">
             <div class="dashboard-grid">
                 <div class="stat-card">
@@ -748,7 +730,6 @@
                 </div>
             </div>
 
-            <!-- PROMOCIONES POR SUCURSAL -->
             <div class="panel">
                 <div class="panel-header">
                     <h3 class="panel-title">📊 Promociones por Sucursal</h3>
@@ -768,7 +749,6 @@
             </div>
         </section>
 
-        <!-- PROMOCIONES SECTION -->
         <section id="promociones" class="content-section">
             <div class="panel">
                 <div class="panel-header">
@@ -876,7 +856,6 @@
             </div>
         </section>
 
-        <!-- SUCURSALES SECTION -->
         <section id="sucursales" class="content-section">
             <div class="panel">
                 <div class="panel-header">
@@ -919,7 +898,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🦷 Panel Admin cargado');
 
-            // NAVEGACIÓN CON EVENT DELEGATION
             document.querySelectorAll('.menu-link').forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -932,27 +910,20 @@
             cargarPromociones();
         });
 
-        // NAVEGACIÓN CORREGIDA
         function showSection(sectionName) {
-            // Ocultar todas las secciones
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-
-            // Remover active de todos los links
             document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
 
-            // Mostrar sección seleccionada
             const section = document.getElementById(sectionName);
             if (section) {
                 section.classList.add('active');
             }
 
-            // Activar link del menú
             const activeLink = document.querySelector(`[data-section="${sectionName}"]`);
             if (activeLink) {
                 activeLink.classList.add('active');
             }
 
-            // Cambiar título
             const titles = {
                 'dashboard': 'Dashboard',
                 'promociones': 'Gestión de Promociones',
@@ -960,7 +931,6 @@
             };
             document.getElementById('pageTitle').textContent = titles[sectionName] || 'Panel Admin';
 
-            // Actualizar datos según sección
             if (sectionName === 'dashboard') {
                 actualizarDashboard();
             } else if (sectionName === 'sucursales') {
@@ -1124,7 +1094,6 @@
                 const descripcionCorta = promo.descripcion.length > 80 ? 
                     promo.descripcion.substring(0, 80) + '...' : promo.descripcion;
 
-                // Escapar comillas para evitar errores en JSON
                 const promoJSON = JSON.stringify(promo).replace(/"/g, '&quot;');
 
                 return `<tr>
@@ -1148,48 +1117,76 @@
             document.getElementById('btnNext').disabled = paginaActual >= totalPaginas;
         }
 
+        // ⭐ FORM SUBMIT CON DEBUGGING
         document.getElementById('promocionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            console.log('🔍 INICIANDO SUBMIT...');
+
+            // NO enviar nombre_sucursal - quizás ese es el problema
             const datos = {
                 id_sucursal: parseInt(document.getElementById('idSucursal').value),
                 descripcion: document.getElementById('descripcion').value,
                 precio: document.getElementById('precio').value || null,
-                activa: parseInt(document.getElementById('activa').value),
-                nombre_sucursal: sucursales.find(s => s.id_sucursal === parseInt(document.getElementById('idSucursal').value))?.nombre_sucursal || ''
+                activa: parseInt(document.getElementById('activa').value)
             };
+
+            console.log('📤 DATOS A ENVIAR:', datos);
+            console.log('📤 JSON:', JSON.stringify(datos));
 
             try {
                 showLoading(true);
 
                 if (modoEdicion) {
                     const id = document.getElementById('promoId').value;
-                    await fetch(SUPABASE_URL + '/promociones?id=eq.' + id, {
+                    console.log('✏️ MODO EDICIÓN - ID:', id);
+
+                    const response = await fetch(SUPABASE_URL + '/promociones?id=eq.' + id, {
                         method: 'PATCH',
                         headers: headers,
                         body: JSON.stringify(datos)
                     });
+
+                    console.log('📥 RESPONSE STATUS:', response.status);
+                    const result = await response.json();
+                    console.log('📥 RESPONSE DATA:', result);
+
+                    if (!response.ok) {
+                        throw new Error(JSON.stringify(result));
+                    }
+
                     mostrarAlerta('✅ Promoción actualizada exitosamente', 'success');
                 } else {
-                    await fetch(SUPABASE_URL + '/promociones', {
+                    console.log('➕ MODO CREAR');
+
+                    const response = await fetch(SUPABASE_URL + '/promociones', {
                         method: 'POST',
                         headers: headers,
                         body: JSON.stringify(datos)
                     });
+
+                    console.log('📥 RESPONSE STATUS:', response.status);
+                    const result = await response.json();
+                    console.log('📥 RESPONSE DATA:', result);
+
+                    if (!response.ok) {
+                        throw new Error(JSON.stringify(result));
+                    }
+
                     mostrarAlerta('✅ Promoción creada exitosamente', 'success');
                 }
 
                 cancelarEdicion();
                 cargarPromociones();
             } catch (error) {
-                console.error('❌ Error:', error);
+                console.error('❌ ERROR COMPLETO:', error);
+                console.error('❌ ERROR MESSAGE:', error.message);
                 mostrarAlerta('❌ Error: ' + error.message, 'error');
             } finally {
                 showLoading(false);
             }
         });
 
-        // EDITAR CORREGIDO
         function editarPromocion(promo) {
             showSection('promociones');
             modoEdicion = true;
