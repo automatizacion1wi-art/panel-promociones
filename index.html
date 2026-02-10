@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - Promociones Dental+</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+            color: #e1e8ed;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 100%);
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            color: #4fd1c5;
+            font-size: 36px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: rgba(79, 209, 197, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #4fd1c5;
+            min-width: 150px;
+        }
+
+        .stat-number {
+            font-size: 40px;
+            font-weight: 700;
+            color: #4fd1c5;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #a0aec0;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .panel {
+            background: #1a1f2e;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #2d3748;
+        }
+
+        .panel-title {
+            font-size: 24px;
+            color: #e1e8ed;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 600;
+            color: #a0aec0;
+            margin-bottom: 8px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, textarea, select {
+            padding: 14px;
+            background: #0f1419;
+            border: 2px solid #2d3748;
+            border-radius: 8px;
+            color: #e1e8ed;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4fd1c5;
+            box-shadow: 0 0 0 4px rgba(79, 209, 197, 0.1);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4fd1c5 0%, #38b2ac 100%);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 209, 197, 0.4);
+        }
+
+        .btn-secondary {
+            background: #2d3748;
+            color: #a0aec0;
+        }
+
+        .btn-secondary:hover {
+            background: #4a5568;
+            color: #e1e8ed;
+        }
+
+        .btn-edit {
+            background: #f6ad55;
+            color: #000;
+            padding: 10px 16px;
+            font-size: 13px;
+        }
+
+        .btn-edit:hover {
+            background: #ed8936;
+        }
+
+        .btn-delete {
+            background: #fc8181;
+            color: #fff;
+            padding: 10px 16px;
+            font-size: 13px;
+        }
+
+        .btn-delete:hover {
+            background: #f56565;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        thead {
+            background: #0f1419;
+        }
+
+        th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            color: #4fd1c5;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #2d3748;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #2d3748;
+            font-size: 14px;
+            color: #a0aec0;
+        }
+
+        tbody tr {
+            transition: all 0.2s;
+        }
+
+        tbody tr:hover {
+            background: rgba(79, 209, 197, 0.05);
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+
+        .badge-active {
+            background: rgba(72, 187, 120, 0.2);
+            color: #48bb78;
+            border: 1px solid #48bb78;
+        }
+
+        .badge-inactive {
+            background: rgba(252, 129, 129, 0.2);
+            color: #fc8181;
+            border: 1px solid #fc8181;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            animation: slideDown 0.3s ease;
+        }
+
+        .alert.show {
+            display: flex;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: rgba(72, 187, 120, 0.2);
+            color: #48bb78;
+            border-left: 4px solid #48bb78;
+        }
+
+        .alert-error {
+            background: rgba(252, 129, 129, 0.2);
+            color: #fc8181;
+            border-left: 4px solid #fc8181;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #718096;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1a1f2e;
+            padding: 30px 50px;
+            border-radius: 12px;
+            z-index: 9999;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                justify-content: center;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading">⏳ Cargando...</div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🦷 Panel Admin Promociones</h1>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalPromos">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="activasPromos">0</div>
+                    <div class="stat-label">Activas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="inactivasPromos">0</div>
+                    <div class="stat-label">Inactivas</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="alertSuccess" class="alert alert-success"></div>
+        <div id="alertError" class="alert alert-error"></div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h3 class="panel-title" id="formTitle"><span>➕</span><span>Nueva Promoción</span></h3>
+            </div>
+            <form id="promocionForm">
+                <input type="hidden" id="promoId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="idSucursal">🏥 Sucursal *</label>
+                        <select id="idSucursal" required>
+                            <option value="">Cargando...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="precio">💰 Precio</label>
+                        <input type="text" id="precio" placeholder="Ej: $999">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="descripcion">📝 Descripción *</label>
+                        <textarea id="descripcion" required placeholder="Descripción completa de la promoción"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="activa">✅ Estado</label>
+                        <select id="activa">
+                            <option value="true">Activa</option>
+                            <option value="false">Inactiva</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span id="btnText">💾 Guardar Promoción</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="cancelarEdicion()">
+                    🔄 Cancelar
+                </button>
+            </form>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h3 class="panel-title"><span>📋</span><span>Promociones Registradas</span></h3>
+                <button class="btn btn-secondary" onclick="cargarPromociones()">
+                    🔄 Recargar
+                </button>
+            </div>
+
+            <div id="emptyState" class="empty-state" style="display:none;">
+                <div class="empty-icon">📭</div>
+                <h3>No hay promociones registradas</h3>
+                <p>Crea tu primera promoción usando el formulario de arriba</p>
+            </div>
+
+            <div id="tableContainer">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sucursal</th>
+                            <th>Descripción</th>
+                            <th>Precio</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="promocionesTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURACIÓN SUPABASE
+        const SUPABASE_URL = 'https://sdqmuabsdsghptbttwiy.supabase.co/rest/v1';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkcW11YWJzZHNnaHB0YnR0d2l5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MTQ2NjMsImV4cCI6MjA4NTk5MDY2M30.Ki1AazQ5A7QcQuA0wUOjujGAGn1k749VRK2qoD7vNR0';
+
+        const headers = {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Content-Type': 'application/json'
+        };
+
+        let modoEdicion = false;
+        let promociones = [];
+        let sucursales = [];
+
+        // INICIALIZACIÓN
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🦷 Panel Admin cargado');
+            cargarSucursales();
+            cargarPromociones();
+        });
+
+        // CARGAR SUCURSALES
+        async function cargarSucursales() {
+            try {
+                showLoading(true);
+                const response = await fetch(SUPABASE_URL + '/sucursales?select=*&order=nombre_sucursal', {
+                    headers: headers
+                });
+
+                sucursales = await response.json();
+
+                const select = document.getElementById('idSucursal');
+                select.innerHTML = '<option value="">Selecciona una sucursal</option>';
+
+                sucursales.forEach(suc => {
+                    select.innerHTML += `<option value="${suc.id}">${suc.nombre_sucursal} - ${suc.ciudad}</option>`;
+                });
+
+                console.log('✅ Sucursales cargadas:', sucursales.length);
+            } catch (error) {
+                console.error('❌ Error:', error);
+                mostrarAlerta('Error cargando sucursales', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // CARGAR PROMOCIONES
+        async function cargarPromociones() {
+            try {
+                showLoading(true);
+                const response = await fetch(
+                    SUPABASE_URL + '/promociones?select=*,sucursales(nombre_sucursal,ciudad)&order=created_at.desc',
+                    { headers: headers }
+                );
+
+                promociones = await response.json();
+                renderizarPromociones();
+                actualizarEstadisticas();
+
+                console.log('✅ Promociones cargadas:', promociones.length);
+            } catch (error) {
+                console.error('❌ Error:', error);
+                mostrarAlerta('Error cargando promociones', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // RENDERIZAR PROMOCIONES
+        function renderizarPromociones() {
+            const emptyState = document.getElementById('emptyState');
+            const tableContainer = document.getElementById('tableContainer');
+            const tbody = document.getElementById('promocionesTable');
+
+            if (promociones.length === 0) {
+                emptyState.style.display = 'block';
+                tableContainer.style.display = 'none';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            tableContainer.style.display = 'block';
+
+            tbody.innerHTML = promociones.map(promo => {
+                const nombreSucursal = promo.sucursales?.nombre_sucursal || 'N/A';
+                const ciudadSucursal = promo.sucursales?.ciudad || '';
+                const estadoBadge = promo.activa ? 
+                    '<span class="badge badge-active">✓ Activa</span>' : 
+                    '<span class="badge badge-inactive">✗ Inactiva</span>';
+
+                const descripcionCorta = promo.descripcion.length > 80 ? 
+                    promo.descripcion.substring(0, 80) + '...' : 
+                    promo.descripcion;
+
+                return `<tr>
+                    <td>
+                        <strong>${nombreSucursal}</strong><br>
+                        <small style="color: #718096;">${ciudadSucursal}</small>
+                    </td>
+                    <td><small>${descripcionCorta}</small></td>
+                    <td><strong>${promo.precio || 'N/A'}</strong></td>
+                    <td>${estadoBadge}</td>
+                    <td>
+                        <button class="btn btn-edit" onclick='editarPromocion(${JSON.stringify(promo).replace(/'/g, "&apos;")})'>
+                            ✏️ Editar
+                        </button>
+                        <button class="btn btn-delete" onclick="eliminarPromocion(${promo.id})">
+                            🗑️ Eliminar
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ACTUALIZAR ESTADÍSTICAS
+        function actualizarEstadisticas() {
+            const activas = promociones.filter(p => p.activa).length;
+            const inactivas = promociones.length - activas;
+
+            document.getElementById('totalPromos').textContent = promociones.length;
+            document.getElementById('activasPromos').textContent = activas;
+            document.getElementById('inactivasPromos').textContent = inactivas;
+        }
+
+        // SUBMIT FORM
+        document.getElementById('promocionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const datos = {
+                id_sucursal: parseInt(document.getElementById('idSucursal').value),
+                descripcion: document.getElementById('descripcion').value,
+                precio: document.getElementById('precio').value || null,
+                activa: document.getElementById('activa').value === 'true'
+            };
+
+            try {
+                showLoading(true);
+
+                if (modoEdicion) {
+                    // ACTUALIZAR
+                    const id = document.getElementById('promoId').value;
+                    await fetch(SUPABASE_URL + '/promociones?id=eq.' + id, {
+                        method: 'PATCH',
+                        headers: headers,
+                        body: JSON.stringify(datos)
+                    });
+
+                    mostrarAlerta('✅ Promoción actualizada exitosamente', 'success');
+                } else {
+                    // CREAR
+                    await fetch(SUPABASE_URL + '/promociones', {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify(datos)
+                    });
+
+                    mostrarAlerta('✅ Promoción creada exitosamente', 'success');
+                }
+
+                cancelarEdicion();
+                cargarPromociones();
+            } catch (error) {
+                console.error('❌ Error:', error);
+                mostrarAlerta('❌ Error: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // EDITAR PROMOCIÓN
+        function editarPromocion(promo) {
+            modoEdicion = true;
+            document.getElementById('formTitle').innerHTML = '<span>✏️</span><span>Editar Promoción</span>';
+            document.getElementById('btnText').textContent = '💾 Actualizar';
+            document.getElementById('promoId').value = promo.id;
+            document.getElementById('idSucursal').value = promo.id_sucursal || '';
+            document.getElementById('descripcion').value = promo.descripcion || '';
+            document.getElementById('precio').value = promo.precio || '';
+            document.getElementById('activa').value = promo.activa ? 'true' : 'false';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // CANCELAR EDICIÓN
+        function cancelarEdicion() {
+            modoEdicion = false;
+            document.getElementById('formTitle').innerHTML = '<span>➕</span><span>Nueva Promoción</span>';
+            document.getElementById('btnText').textContent = '💾 Guardar Promoción';
+            document.getElementById('promocionForm').reset();
+            document.getElementById('promoId').value = '';
+        }
+
+        // ELIMINAR PROMOCIÓN
+        async function eliminarPromocion(id) {
+            if (!confirm('¿Estás seguro de eliminar esta promoción?')) return;
+
+            try {
+                showLoading(true);
+                await fetch(SUPABASE_URL + '/promociones?id=eq.' + id, {
+                    method: 'DELETE',
+                    headers: headers
+                });
+
+                mostrarAlerta('✅ Promoción eliminada exitosamente', 'success');
+                cargarPromociones();
+            } catch (error) {
+                console.error('❌ Error:', error);
+                mostrarAlerta('❌ Error al eliminar', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // MOSTRAR ALERTA
+        function mostrarAlerta(mensaje, tipo) {
+            const alertId = tipo === 'success' ? 'alertSuccess' : 'alertError';
+            const alert = document.getElementById(alertId);
+            alert.textContent = mensaje;
+            alert.classList.add('show');
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 5000);
+        }
+
+        // LOADING
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            if (show) {
+                loading.classList.add('show');
+            } else {
+                loading.classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>
