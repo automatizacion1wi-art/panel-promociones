@@ -631,7 +631,7 @@
             }
         }
 
-        // CARGAR PROMOCIONES
+        // CARGAR PROMOCIONES (SIN JOIN - YA CORREGIDO)
         async function cargarPromociones() {
             try {
                 showLoading(true);
@@ -642,6 +642,7 @@
 
                 const data = await response.json();
 
+                // VERIFICAR QUE SEA ARRAY
                 if (Array.isArray(data)) {
                     promociones = data;
                 } else {
@@ -656,6 +657,8 @@
             } catch (error) {
                 console.error('❌ Error:', error);
                 mostrarAlerta('Error cargando promociones', 'error');
+                promociones = []; // RESET en caso de error
+                aplicarFiltros();
             } finally {
                 showLoading(false);
             }
