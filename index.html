@@ -334,26 +334,51 @@
             background: var(--blue-60);
         }
 
+        /* BOTONES DE ACCIONES - CORREGIDOS */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
         .btn-edit {
             background: #fbb040;
             color: var(--white-00);
-            padding: 10px 20px;
-            font-size: 14px;
+            padding: 8px 16px;
+            font-size: 13px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .btn-edit:hover {
             background: #f59e0b;
+            transform: translateY(-1px);
         }
 
         .btn-delete {
             background: #fc8181;
             color: var(--white-00);
-            padding: 10px 20px;
-            font-size: 14px;
+            padding: 8px 16px;
+            font-size: 13px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .btn-delete:hover {
             background: #f56565;
+            transform: translateY(-1px);
         }
 
         /* TABLE */
@@ -619,6 +644,10 @@
             .filter-group select {
                 min-width: 100%;
             }
+
+            .action-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -630,17 +659,17 @@
         <div class="logo">🦷 Dental+</div>
         <ul class="menu">
             <li class="menu-item">
-                <a class="menu-link active" onclick="showSection('dashboard')">
+                <a class="menu-link active" data-section="dashboard">
                     📊 <span>Dashboard</span>
                 </a>
             </li>
             <li class="menu-item">
-                <a class="menu-link" onclick="showSection('promociones')">
+                <a class="menu-link" data-section="promociones">
                     🎁 <span>Promociones</span>
                 </a>
             </li>
             <li class="menu-item">
-                <a class="menu-link" onclick="showSection('sucursales')">
+                <a class="menu-link" data-section="sucursales">
                     🏥 <span>Sucursales</span>
                 </a>
             </li>
@@ -889,26 +918,52 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🦷 Panel Admin cargado');
+
+            // NAVEGACIÓN CON EVENT DELEGATION
+            document.querySelectorAll('.menu-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                });
+            });
+
             cargarSucursales();
             cargarPromociones();
         });
 
-        function showSection(section) {
+        // NAVEGACIÓN CORREGIDA
+        function showSection(sectionName) {
+            // Ocultar todas las secciones
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
-            document.getElementById(section).classList.add('active');
-            event.target.closest('.menu-link').classList.add('active');
 
+            // Remover active de todos los links
+            document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
+
+            // Mostrar sección seleccionada
+            const section = document.getElementById(sectionName);
+            if (section) {
+                section.classList.add('active');
+            }
+
+            // Activar link del menú
+            const activeLink = document.querySelector(`[data-section="${sectionName}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+
+            // Cambiar título
             const titles = {
                 'dashboard': 'Dashboard',
                 'promociones': 'Gestión de Promociones',
                 'sucursales': 'Sucursales'
             };
-            document.getElementById('pageTitle').textContent = titles[section] || 'Panel Admin';
+            document.getElementById('pageTitle').textContent = titles[sectionName] || 'Panel Admin';
 
-            if (section === 'dashboard') {
+            // Actualizar datos según sección
+            if (sectionName === 'dashboard') {
                 actualizarDashboard();
-            } else if (section === 'sucursales') {
+            } else if (sectionName === 'sucursales') {
                 renderizarSucursales();
             }
         }
@@ -1069,14 +1124,19 @@
                 const descripcionCorta = promo.descripcion.length > 80 ? 
                     promo.descripcion.substring(0, 80) + '...' : promo.descripcion;
 
+                // Escapar comillas para evitar errores en JSON
+                const promoJSON = JSON.stringify(promo).replace(/"/g, '&quot;');
+
                 return `<tr>
                     <td><strong>${nombreSucursal}</strong><br><small style="color: var(--text-60);">${ciudadSucursal}</small></td>
                     <td><small>${descripcionCorta}</small></td>
                     <td><strong>${promo.precio || 'N/A'}</strong></td>
                     <td>${estadoBadge}</td>
                     <td>
-                        <button class="btn btn-edit" onclick='editarPromocion(${JSON.stringify(promo).replace(/'/g, "&apos;")})'>✏️ Editar</button>
-                        <button class="btn btn-delete" onclick="eliminarPromocion(${promo.id})">🗑️ Eliminar</button>
+                        <div class="action-buttons">
+                            <button class="btn-edit" onclick='editarPromocion(${promoJSON})'>✏️ Editar</button>
+                            <button class="btn-delete" onclick="eliminarPromocion(${promo.id})">🗑️ Eliminar</button>
+                        </div>
                     </td>
                 </tr>`;
             }).join('');
@@ -1129,6 +1189,7 @@
             }
         });
 
+        // EDITAR CORREGIDO
         function editarPromocion(promo) {
             showSection('promociones');
             modoEdicion = true;
