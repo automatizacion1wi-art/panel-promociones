@@ -323,6 +323,86 @@
             display: block;
         }
 
+        /* FILTROS Y PAGINACIÓN */
+        .filters-bar {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-size: 11px;
+            margin: 0;
+        }
+
+        .filter-group select {
+            padding: 10px;
+            min-width: 200px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #2d3748;
+        }
+
+        .pagination-info {
+            color: #a0aec0;
+            font-size: 14px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .pagination-btn {
+            padding: 10px 16px;
+            background: #2d3748;
+            color: #e1e8ed;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #4a5568;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .page-size-selector {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .page-size-selector select {
+            padding: 8px 12px;
+            background: #2d3748;
+            border: 2px solid #4a5568;
+            border-radius: 6px;
+            color: #e1e8ed;
+            font-size: 13px;
+        }
+
         @media (max-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -338,6 +418,19 @@
 
             th, td {
                 padding: 10px;
+            }
+
+            .filters-bar {
+                flex-direction: column;
+            }
+
+            .filter-group select {
+                min-width: 100%;
+            }
+
+            .pagination {
+                flex-direction: column;
+                gap: 15px;
             }
         }
     </style>
@@ -413,10 +506,31 @@
                 </button>
             </div>
 
+            <!-- FILTROS -->
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label>🔍 Filtrar por Sucursal</label>
+                    <select id="filtroSucursal" onchange="aplicarFiltros()">
+                        <option value="">Todas las sucursales</option>
+                    </select>
+                </div>
+
+                <div class="page-size-selector">
+                    <label style="color: #a0aec0; font-size: 13px;">Mostrar:</label>
+                    <select id="pageSize" onchange="cambiarTamañoPagina()">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span style="color: #a0aec0; font-size: 13px;">por página</span>
+                </div>
+            </div>
+
             <div id="emptyState" class="empty-state" style="display:none;">
                 <div class="empty-icon">📭</div>
-                <h3>No hay promociones registradas</h3>
-                <p>Crea tu primera promoción usando el formulario de arriba</p>
+                <h3>No hay promociones</h3>
+                <p>No se encontraron promociones con los filtros seleccionados</p>
             </div>
 
             <div id="tableContainer">
@@ -432,6 +546,24 @@
                     </thead>
                     <tbody id="promocionesTable"></tbody>
                 </table>
+
+                <!-- PAGINACIÓN -->
+                <div class="pagination">
+                    <div class="pagination-info" id="paginationInfo">
+                        Mostrando 0 de 0 promociones
+                    </div>
+                    <div class="pagination-controls">
+                        <button class="pagination-btn" onclick="cambiarPagina(-1)" id="btnPrev">
+                            ◀ Anterior
+                        </button>
+                        <span style="color: #a0aec0; font-weight: 600;" id="pageNumber">
+                            Página 1
+                        </span>
+                        <button class="pagination-btn" onclick="cambiarPagina(1)" id="btnNext">
+                            Siguiente ▶
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -451,6 +583,11 @@
         let modoEdicion = false;
         let promociones = [];
         let sucursales = [];
+        let promocionesFiltradas = [];
+
+        // PAGINACIÓN
+        let paginaActual = 1;
+        let itemsPorPagina = 10;
 
         // INICIALIZACIÓN
         document.addEventListener('DOMContentLoaded', () => {
@@ -469,11 +606,20 @@
 
                 sucursales = await response.json();
 
+                // Llenar select del formulario
                 const select = document.getElementById('idSucursal');
                 select.innerHTML = '<option value="">Selecciona una sucursal</option>';
 
                 sucursales.forEach(suc => {
                     select.innerHTML += `<option value="${suc.id_sucursal}">${suc.nombre_sucursal} - ${suc.ciudad}</option>`;
+                });
+
+                // Llenar select del filtro
+                const filtroSelect = document.getElementById('filtroSucursal');
+                filtroSelect.innerHTML = '<option value="">Todas las sucursales</option>';
+
+                sucursales.forEach(suc => {
+                    filtroSelect.innerHTML += `<option value="${suc.id_sucursal}">${suc.nombre_sucursal} - ${suc.ciudad}</option>`;
                 });
 
                 console.log('✅ Sucursales cargadas:', sucursales.length);
@@ -485,7 +631,7 @@
             }
         }
 
-        // CARGAR PROMOCIONES (SIN JOIN - porque no hay FK)
+        // CARGAR PROMOCIONES
         async function cargarPromociones() {
             try {
                 showLoading(true);
@@ -496,7 +642,6 @@
 
                 const data = await response.json();
 
-                // Verificar si es array
                 if (Array.isArray(data)) {
                     promociones = data;
                 } else {
@@ -504,7 +649,7 @@
                     promociones = [];
                 }
 
-                renderizarPromociones();
+                aplicarFiltros();
                 actualizarEstadisticas();
 
                 console.log('✅ Promociones cargadas:', promociones.length);
@@ -516,13 +661,41 @@
             }
         }
 
-        // RENDERIZAR PROMOCIONES
+        // APLICAR FILTROS
+        function aplicarFiltros() {
+            const filtroSucursal = document.getElementById('filtroSucursal').value;
+
+            promocionesFiltradas = promociones.filter(promo => {
+                if (filtroSucursal && promo.id_sucursal != filtroSucursal) {
+                    return false;
+                }
+                return true;
+            });
+
+            paginaActual = 1; // Reset a página 1
+            renderizarPromociones();
+        }
+
+        // CAMBIAR TAMAÑO DE PÁGINA
+        function cambiarTamañoPagina() {
+            itemsPorPagina = parseInt(document.getElementById('pageSize').value);
+            paginaActual = 1;
+            renderizarPromociones();
+        }
+
+        // CAMBIAR PÁGINA
+        function cambiarPagina(direccion) {
+            paginaActual += direccion;
+            renderizarPromociones();
+        }
+
+        // RENDERIZAR PROMOCIONES CON PAGINACIÓN
         function renderizarPromociones() {
             const emptyState = document.getElementById('emptyState');
             const tableContainer = document.getElementById('tableContainer');
             const tbody = document.getElementById('promocionesTable');
 
-            if (promociones.length === 0) {
+            if (promocionesFiltradas.length === 0) {
                 emptyState.style.display = 'block';
                 tableContainer.style.display = 'none';
                 return;
@@ -531,8 +704,14 @@
             emptyState.style.display = 'none';
             tableContainer.style.display = 'block';
 
-            tbody.innerHTML = promociones.map(promo => {
-                // Buscar sucursal por id_sucursal
+            // Calcular índices de paginación
+            const totalPaginas = Math.ceil(promocionesFiltradas.length / itemsPorPagina);
+            const inicio = (paginaActual - 1) * itemsPorPagina;
+            const fin = inicio + itemsPorPagina;
+            const promocionesPagina = promocionesFiltradas.slice(inicio, fin);
+
+            // Renderizar tabla
+            tbody.innerHTML = promocionesPagina.map(promo => {
                 const sucursalData = sucursales.find(s => s.id_sucursal === promo.id_sucursal);
                 const nombreSucursal = sucursalData?.nombre_sucursal || promo.nombre_sucursal || 'N/A';
                 const ciudadSucursal = sucursalData?.ciudad || '';
@@ -563,6 +742,16 @@
                     </td>
                 </tr>`;
             }).join('');
+
+            // Actualizar info de paginación
+            document.getElementById('paginationInfo').textContent = 
+                `Mostrando ${inicio + 1}-${Math.min(fin, promocionesFiltradas.length)} de ${promocionesFiltradas.length} promociones`;
+
+            document.getElementById('pageNumber').textContent = `Página ${paginaActual} de ${totalPaginas}`;
+
+            // Botones de navegación
+            document.getElementById('btnPrev').disabled = paginaActual === 1;
+            document.getElementById('btnNext').disabled = paginaActual >= totalPaginas;
         }
 
         // ACTUALIZAR ESTADÍSTICAS
@@ -591,7 +780,6 @@
                 showLoading(true);
 
                 if (modoEdicion) {
-                    // ACTUALIZAR
                     const id = document.getElementById('promoId').value;
                     await fetch(SUPABASE_URL + '/promociones?id=eq.' + id, {
                         method: 'PATCH',
@@ -601,7 +789,6 @@
 
                     mostrarAlerta('✅ Promoción actualizada exitosamente', 'success');
                 } else {
-                    // CREAR
                     await fetch(SUPABASE_URL + '/promociones', {
                         method: 'POST',
                         headers: headers,
