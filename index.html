@@ -1117,60 +1117,45 @@
             document.getElementById('btnNext').disabled = paginaActual >= totalPaginas;
         }
 
-        // ⭐ FORM SUBMIT CON DEBUGGING
+        // ⭐⭐⭐ AQUÍ ESTÁ EL CAMBIO IMPORTANTE ⭐⭐⭐
         document.getElementById('promocionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            console.log('🔍 INICIANDO SUBMIT...');
-
-            // NO enviar nombre_sucursal - quizás ese es el problema
             const datos = {
                 id_sucursal: parseInt(document.getElementById('idSucursal').value),
                 descripcion: document.getElementById('descripcion').value,
                 precio: document.getElementById('precio').value || null,
-                activa: parseInt(document.getElementById('activa').value)
+                activa: parseInt(document.getElementById('activa').value),
+                nombre_sucursal: sucursales.find(s => s.id_sucursal === parseInt(document.getElementById('idSucursal').value))?.nombre_sucursal || ''
             };
-
-            console.log('📤 DATOS A ENVIAR:', datos);
-            console.log('📤 JSON:', JSON.stringify(datos));
 
             try {
                 showLoading(true);
 
                 if (modoEdicion) {
                     const id = document.getElementById('promoId').value;
-                    console.log('✏️ MODO EDICIÓN - ID:', id);
-
                     const response = await fetch(SUPABASE_URL + '/promociones?id=eq.' + id, {
                         method: 'PATCH',
                         headers: headers,
                         body: JSON.stringify(datos)
                     });
 
-                    console.log('📥 RESPONSE STATUS:', response.status);
-                    const result = await response.json();
-                    console.log('📥 RESPONSE DATA:', result);
-
                     if (!response.ok) {
-                        throw new Error(JSON.stringify(result));
+                        const error = await response.json();
+                        throw new Error(JSON.stringify(error));
                     }
 
                     mostrarAlerta('✅ Promoción actualizada exitosamente', 'success');
                 } else {
-                    console.log('➕ MODO CREAR');
-
                     const response = await fetch(SUPABASE_URL + '/promociones', {
                         method: 'POST',
                         headers: headers,
                         body: JSON.stringify(datos)
                     });
 
-                    console.log('📥 RESPONSE STATUS:', response.status);
-                    const result = await response.json();
-                    console.log('📥 RESPONSE DATA:', result);
-
                     if (!response.ok) {
-                        throw new Error(JSON.stringify(result));
+                        const error = await response.json();
+                        throw new Error(JSON.stringify(error));
                     }
 
                     mostrarAlerta('✅ Promoción creada exitosamente', 'success');
@@ -1179,8 +1164,7 @@
                 cancelarEdicion();
                 cargarPromociones();
             } catch (error) {
-                console.error('❌ ERROR COMPLETO:', error);
-                console.error('❌ ERROR MESSAGE:', error.message);
+                console.error('❌ ERROR:', error);
                 mostrarAlerta('❌ Error: ' + error.message, 'error');
             } finally {
                 showLoading(false);
