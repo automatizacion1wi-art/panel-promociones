@@ -4,7 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Admin - Promociones Dental+</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Jost:wght@600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --text-100: #26282c;
+            --text-80: #4e5565;
+            --text-60: #6d7488;
+            --text-40: #929bb2;
+            --blue-100: #0879ca;
+            --blue-150: #0761b4;
+            --blue-80: #9ebdd9;
+            --blue-60: #dce4eb;
+            --blue-40: #e8ecef;
+            --blue-200: #00408c;
+            --blue-300: #01162f;
+            --dentalink-blue-500: #17a6e0;
+            --dentalink-blue-100: #e1f3fd;
+            --white-00: white;
+            --grey-20: #fafafa;
+            --secondary-50: #7f52fe;
+            --secondary-100: #521ee6;
+            --secondary-200: #3c16aa;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,10 +36,12 @@
         }
 
         body {
-            font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f5f7fa;
-            color: #2d3748;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--grey-20);
+            color: var(--text-100);
             min-height: 100vh;
+            font-size: 14px;
+            line-height: 150%;
         }
 
         /* SIDEBAR */
@@ -25,15 +51,16 @@
             top: 0;
             width: 260px;
             height: 100vh;
-            background: linear-gradient(180deg, #1a7f64 0%, #24c484 100%);
+            background: linear-gradient(180deg, var(--blue-200) 0%, var(--blue-100) 100%);
             padding: 30px 20px;
             box-shadow: 4px 0 12px rgba(0,0,0,0.08);
             z-index: 1000;
         }
 
         .logo {
-            color: white;
-            font-size: 26px;
+            color: var(--white-00);
+            font-family: 'Jost', sans-serif;
+            font-size: 28px;
             font-weight: 700;
             margin-bottom: 40px;
             display: flex;
@@ -56,15 +83,16 @@
             padding: 14px 16px;
             color: rgba(255,255,255,0.8);
             text-decoration: none;
-            border-radius: 10px;
+            border-radius: 6px;
             transition: all 0.2s;
             font-size: 15px;
             cursor: pointer;
+            font-weight: 500;
         }
 
         .menu-link:hover, .menu-link.active {
             background: rgba(255,255,255,0.15);
-            color: white;
+            color: var(--white-00);
         }
 
         .menu-link.active {
@@ -87,9 +115,10 @@
         }
 
         .page-title {
+            font-family: 'Jost', sans-serif;
             font-size: 32px;
             font-weight: 700;
-            color: #1a202c;
+            color: var(--text-100);
         }
 
         .user-info {
@@ -97,8 +126,8 @@
             align-items: center;
             gap: 12px;
             padding: 10px 16px;
-            background: white;
-            border-radius: 12px;
+            background: var(--white-00);
+            border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
 
@@ -106,11 +135,11 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #24c484, #1a7f64);
+            background: linear-gradient(135deg, var(--blue-100), var(--blue-150));
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: var(--white-00);
             font-weight: 600;
             font-size: 16px;
         }
@@ -124,11 +153,11 @@
         }
 
         .stat-card {
-            background: white;
+            background: var(--white-00);
             padding: 24px;
-            border-radius: 16px;
+            border-radius: 8px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-            border-left: 4px solid #24c484;
+            border-left: 4px solid var(--blue-100);
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
@@ -145,8 +174,8 @@
         }
 
         .stat-title {
-            font-size: 13px;
-            color: #718096;
+            font-size: 12px;
+            color: var(--text-60);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 600;
@@ -155,8 +184,8 @@
         .stat-icon {
             width: 44px;
             height: 44px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #e6f9f3, #c8f3e3);
+            border-radius: 8px;
+            background: var(--dentalink-blue-100);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -164,9 +193,10 @@
         }
 
         .stat-value {
+            font-family: 'Jost', sans-serif;
             font-size: 36px;
             font-weight: 700;
-            color: #1a202c;
+            color: var(--text-100);
             margin-bottom: 8px;
         }
 
@@ -175,10 +205,11 @@
             display: flex;
             align-items: center;
             gap: 4px;
+            font-weight: 500;
         }
 
         .stat-change.positive {
-            color: #24c484;
+            color: var(--blue-100);
         }
 
         .stat-change.negative {
@@ -187,8 +218,8 @@
 
         /* PANEL */
         .panel {
-            background: white;
-            border-radius: 16px;
+            background: var(--white-00);
+            border-radius: 8px;
             padding: 30px;
             margin-bottom: 30px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.06);
@@ -200,13 +231,14 @@
             align-items: center;
             margin-bottom: 25px;
             padding-bottom: 20px;
-            border-bottom: 2px solid #e2e8f0;
+            border-bottom: 2px solid var(--blue-40);
         }
 
         .panel-title {
-            font-size: 22px;
+            font-family: 'Jost', sans-serif;
+            font-size: 24px;
             font-weight: 700;
-            color: #1a202c;
+            color: var(--text-100);
             display: flex;
             align-items: center;
             gap: 12px;
@@ -231,27 +263,26 @@
 
         label {
             font-weight: 600;
-            color: #4a5568;
+            color: var(--text-80);
             margin-bottom: 8px;
             font-size: 14px;
         }
 
         input, textarea, select {
             padding: 12px 16px;
-            background: #f7fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            color: #2d3748;
+            background: var(--white-00);
+            border: 1px solid var(--blue-60);
+            border-radius: 6px;
+            color: var(--text-100);
             font-size: 14px;
             transition: all 0.2s;
-            font-family: inherit;
+            font-family: 'Inter', sans-serif;
         }
 
         input:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: #24c484;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(36, 196, 132, 0.1);
+            border-color: var(--blue-100);
+            box-shadow: 0 0 0 3px var(--dentalink-blue-100);
         }
 
         textarea {
@@ -259,45 +290,55 @@
             resize: vertical;
         }
 
-        /* BUTTONS */
+        /* BUTTONS - ESTILO EXACTO DENTALINK */
         .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
+            grid-column-gap: 8px;
+            grid-row-gap: 8px;
+            border-radius: 6px;
+            flex-direction: row;
+            flex: none;
+            justify-content: center;
+            align-items: center;
+            padding: 16px 32px;
+            line-height: 120%;
+            text-decoration: none;
+            transition: all .2s;
+            display: inline-flex;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-right: 10px;
+            border: none;
+            text-align: center;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #24c484 0%, #1a7f64 100%);
-            color: white;
+            border: 1px solid var(--blue-100);
+            background-color: var(--blue-100);
+            color: var(--white-00);
         }
 
         .btn-primary:hover {
+            background-color: var(--blue-150);
+            border-color: var(--blue-150);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(36, 196, 132, 0.3);
+            box-shadow: 0 6px 20px rgba(8, 121, 202, 0.3);
         }
 
         .btn-secondary {
-            background: #e2e8f0;
-            color: #4a5568;
+            background: var(--blue-40);
+            color: var(--text-80);
+            border: 1px solid var(--blue-60);
         }
 
         .btn-secondary:hover {
-            background: #cbd5e0;
+            background: var(--blue-60);
         }
 
         .btn-edit {
             background: #fbb040;
-            color: white;
-            padding: 8px 14px;
-            font-size: 13px;
+            color: var(--white-00);
+            padding: 10px 20px;
+            font-size: 14px;
         }
 
         .btn-edit:hover {
@@ -306,9 +347,9 @@
 
         .btn-delete {
             background: #fc8181;
-            color: white;
-            padding: 8px 14px;
-            font-size: 13px;
+            color: var(--white-00);
+            padding: 10px 20px;
+            font-size: 14px;
         }
 
         .btn-delete:hover {
@@ -323,25 +364,25 @@
         }
 
         thead {
-            background: #f7fafc;
+            background: var(--grey-20);
         }
 
         th {
             padding: 14px 16px;
             text-align: left;
             font-weight: 600;
-            font-size: 13px;
-            color: #4a5568;
+            font-size: 12px;
+            color: var(--text-80);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border-bottom: 2px solid #e2e8f0;
+            border-bottom: 2px solid var(--blue-60);
         }
 
         td {
             padding: 14px 16px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--blue-40);
             font-size: 14px;
-            color: #4a5568;
+            color: var(--text-80);
         }
 
         tbody tr {
@@ -349,7 +390,7 @@
         }
 
         tbody tr:hover {
-            background: #f7fafc;
+            background: var(--grey-20);
         }
 
         /* BADGES */
@@ -362,8 +403,8 @@
         }
 
         .badge-active {
-            background: #c6f6d5;
-            color: #22543d;
+            background: var(--dentalink-blue-100);
+            color: var(--blue-200);
         }
 
         .badge-inactive {
@@ -403,11 +444,11 @@
             align-items: center;
             margin-top: 25px;
             padding-top: 20px;
-            border-top: 2px solid #e2e8f0;
+            border-top: 2px solid var(--blue-40);
         }
 
         .pagination-info {
-            color: #718096;
+            color: var(--text-60);
             font-size: 14px;
         }
 
@@ -418,11 +459,11 @@
         }
 
         .pagination-btn {
-            padding: 8px 16px;
-            background: white;
-            color: #4a5568;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
+            padding: 10px 20px;
+            background: var(--white-00);
+            color: var(--text-80);
+            border: 1px solid var(--blue-60);
+            border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
@@ -430,9 +471,9 @@
         }
 
         .pagination-btn:hover:not(:disabled) {
-            background: #f7fafc;
-            border-color: #24c484;
-            color: #24c484;
+            background: var(--blue-40);
+            border-color: var(--blue-100);
+            color: var(--blue-100);
         }
 
         .pagination-btn:disabled {
@@ -448,15 +489,15 @@
 
         .page-size-selector select {
             padding: 8px 12px;
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
+            background: var(--white-00);
+            border: 1px solid var(--blue-60);
+            border-radius: 6px;
         }
 
         /* ALERTS */
         .alert {
             padding: 16px 20px;
-            border-radius: 12px;
+            border-radius: 6px;
             margin-bottom: 20px;
             display: none;
             align-items: center;
@@ -481,9 +522,9 @@
         }
 
         .alert-success {
-            background: #c6f6d5;
-            color: #22543d;
-            border-left: 4px solid #24c484;
+            background: var(--dentalink-blue-100);
+            color: var(--blue-200);
+            border-left: 4px solid var(--blue-100);
         }
 
         .alert-error {
@@ -496,7 +537,7 @@
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: #a0aec0;
+            color: var(--text-40);
         }
 
         .empty-icon {
@@ -512,9 +553,9 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: white;
+            background: var(--white-00);
             padding: 30px 50px;
-            border-radius: 16px;
+            border-radius: 8px;
             z-index: 9999;
             box-shadow: 0 8px 32px rgba(0,0,0,0.2);
         }
@@ -614,7 +655,7 @@
                 <div class="user-avatar">A</div>
                 <div>
                     <div style="font-weight: 600; font-size: 14px;">Admin</div>
-                    <div style="font-size: 12px; color: #718096;">Panel de Control</div>
+                    <div style="font-size: 12px; color: var(--text-60);">Panel de Control</div>
                 </div>
             </div>
         </div>
@@ -755,14 +796,14 @@
                     </div>
 
                     <div class="page-size-selector">
-                        <label style="color: #718096; font-size: 13px;">Mostrar:</label>
+                        <label style="color: var(--text-60); font-size: 13px;">Mostrar:</label>
                         <select id="pageSize" onchange="cambiarTamañoPagina()">
                             <option value="10">10</option>
                             <option value="20">20</option>
                             <option value="50">50</option>
                             <option value="100">100</option>
                         </select>
-                        <span style="color: #718096; font-size: 13px;">por página</span>
+                        <span style="color: var(--text-60); font-size: 13px;">por página</span>
                     </div>
                 </div>
 
@@ -794,7 +835,7 @@
                             <button class="pagination-btn" onclick="cambiarPagina(-1)" id="btnPrev">
                                 ◀ Anterior
                             </button>
-                            <span style="color: #718096; font-weight: 600;" id="pageNumber">
+                            <span style="color: var(--text-60); font-weight: 600;" id="pageNumber">
                                 Página 1
                             </span>
                             <button class="pagination-btn" onclick="cambiarPagina(1)" id="btnNext">
@@ -852,7 +893,6 @@
             cargarPromociones();
         });
 
-        // NAVEGACIÓN
         function showSection(section) {
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
@@ -873,7 +913,6 @@
             }
         }
 
-        // CARGAR SUCURSALES
         async function cargarSucursales() {
             try {
                 showLoading(true);
@@ -904,7 +943,6 @@
             }
         }
 
-        // CARGAR PROMOCIONES
         async function cargarPromociones() {
             try {
                 showLoading(true);
@@ -929,7 +967,6 @@
             }
         }
 
-        // ACTUALIZAR DASHBOARD
         function actualizarDashboard() {
             const total = promociones.length;
             const activas = promociones.filter(p => p.activa == 1).length;
@@ -945,7 +982,6 @@
             document.getElementById('activasTrend').innerHTML = `<span>↑</span> <span>${porcentajeActivas}%</span> activas`;
             document.getElementById('inactivasTrend').innerHTML = `<span>↓</span> <span>${porcentajeInactivas}%</span> inactivas`;
 
-            // STATS POR SUCURSAL
             const sucursalesStats = sucursales.map(suc => {
                 const promosSuc = promociones.filter(p => p.id_sucursal === suc.id_sucursal);
                 const activasSuc = promosSuc.filter(p => p.activa == 1).length;
@@ -970,7 +1006,6 @@
             `).join('');
         }
 
-        // RENDERIZAR SUCURSALES
         function renderizarSucursales() {
             const tbody = document.getElementById('sucursalesTable');
             tbody.innerHTML = sucursales.map(suc => `
@@ -984,7 +1019,6 @@
             `).join('');
         }
 
-        // APLICAR FILTROS
         function aplicarFiltros() {
             const filtroSucursal = document.getElementById('filtroSucursal').value;
             promocionesFiltradas = promociones.filter(promo => {
@@ -1036,7 +1070,7 @@
                     promo.descripcion.substring(0, 80) + '...' : promo.descripcion;
 
                 return `<tr>
-                    <td><strong>${nombreSucursal}</strong><br><small style="color: #718096;">${ciudadSucursal}</small></td>
+                    <td><strong>${nombreSucursal}</strong><br><small style="color: var(--text-60);">${ciudadSucursal}</small></td>
                     <td><small>${descripcionCorta}</small></td>
                     <td><strong>${promo.precio || 'N/A'}</strong></td>
                     <td>${estadoBadge}</td>
