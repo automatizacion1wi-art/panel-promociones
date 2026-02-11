@@ -247,10 +247,11 @@
         }
 
         async function cargarPromociones() {
-            const response = await fetch(`${SUPABASE_URL}/promociones?select=*&order=id_promocion.desc`, { headers });
-            promociones = await response.json();
-            promocionesFiltradas = [...promociones];
+        const response = await fetch(`${SUPABASE_URL}/promociones?select=*`, { headers });
+        promociones = await response.json();
+        promocionesFiltradas = [...promociones];
         }
+
 
         async function cargarRelaciones() {
             const response = await fetch(`${SUPABASE_URL}/sucursal_promocion?select=*`, { headers });
