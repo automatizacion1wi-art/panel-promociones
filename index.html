@@ -4,20 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Promociones DX-RAY</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦷</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; }
         .section-hidden { display: none; }
+
+        /* Estilos para notificaciones toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+        }
+
+        .toast-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .toast-error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .toast-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast.hiding {
+            animation: slideOut 0.3s ease-out forwards;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
     <div class="min-h-screen">
         <!-- Header -->
         <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
-            <div class="container mx-auto px-6 py-4">
-                <h1 class="text-3xl font-bold">🦷 Dashboard DX-RAY</h1>
-                <p class="text-blue-100">Gestión de Promociones y Sucursales</p>
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold">🦷 Dashboard DX-RAY</h1>
+                    <p class="text-blue-100">Gestión de Promociones y Sucursales</p>
+                </div>
+                <button onclick="recargarDatos()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                    <i class="fas fa-sync-alt" id="iconRecargar"></i>
+                    Recargar
+                </button>
             </div>
         </header>
 
@@ -307,7 +371,6 @@
     </div>
 
     <script>
-        // Credenciales configuradas
         const SUPABASE_URL = 'https://sdqmuabsdsghptbttwiy.supabase.co/rest/v1';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkcW11YWJzZHNnaHB0YnR0d2l5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MTQ2NjMsImV4cCI6MjA4NTk5MDY2M30.Ki1AazQ5A7QcQuA0wUOjujGAGn1k749VRK2qoD7vNR0';
 
@@ -329,6 +392,42 @@
             cargarDatos();
         });
 
+        // Función para mostrar notificaciones toast bonitas
+        function mostrarToast(mensaje, tipo = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${tipo}`;
+
+            const iconos = {
+                success: '<i class="fas fa-check-circle text-2xl"></i>',
+                error: '<i class="fas fa-exclamation-circle text-2xl"></i>',
+                warning: '<i class="fas fa-exclamation-triangle text-2xl"></i>'
+            };
+
+            toast.innerHTML = `
+                ${iconos[tipo]}
+                <span class="font-medium">${mensaje}</span>
+            `;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        async function recargarDatos() {
+            const icon = document.getElementById('iconRecargar');
+            icon.classList.add('fa-spin');
+
+            await cargarDatos();
+
+            setTimeout(() => {
+                icon.classList.remove('fa-spin');
+                mostrarToast('Datos actualizados correctamente', 'success');
+            }, 500);
+        }
+
         async function cargarDatos() {
             try {
                 await Promise.all([
@@ -339,7 +438,7 @@
                 actualizarUI();
             } catch (error) {
                 console.error('Error cargando datos:', error);
-                alert('Error al cargar los datos. Revisa la consola.');
+                mostrarToast('Error al cargar los datos', 'error');
             }
         }
 
@@ -347,18 +446,43 @@
             const response = await fetch(`${SUPABASE_URL}/sucursales?select=*`, { headers });
             sucursales = await response.json();
             llenarSelectSucursales();
-            llenarCheckboxesSucursales();
         }
 
         async function cargarPromociones() {
             const response = await fetch(`${SUPABASE_URL}/promociones?select=*`, { headers });
             promociones = await response.json();
-            promocionesFiltradas = [...promociones];
+            aplicarFiltrosActuales();
         }
 
         async function cargarRelaciones() {
             const response = await fetch(`${SUPABASE_URL}/sucursal_promocion?select=*`, { headers });
             relaciones = await response.json();
+        }
+
+        function aplicarFiltrosActuales() {
+            const sucursalId = document.getElementById('filtroSucursal')?.value || '';
+            const estado = document.getElementById('filtroEstado')?.value || '';
+            const busqueda = document.getElementById('buscarPromo')?.value.toLowerCase() || '';
+
+            promocionesFiltradas = promociones.filter(promo => {
+                if (sucursalId) {
+                    const tieneRelacion = relaciones.some(r => 
+                        r.id_promocion === promo.id_promocion && 
+                        r.id_sucursal == sucursalId
+                    );
+                    if (!tieneRelacion) return false;
+                }
+
+                if (estado !== '') {
+                    if (promo.activa.toString() !== estado) return false;
+                }
+
+                if (busqueda) {
+                    if (!promo.descripcion.toLowerCase().includes(busqueda)) return false;
+                }
+
+                return true;
+            });
         }
 
         function actualizarUI() {
@@ -376,17 +500,17 @@
         }
 
         function cambiarSeccion(seccion) {
-            // Ocultar todas las secciones
+            // Recargar datos al cambiar de sección
+            cargarDatos();
+
             document.getElementById('section-dashboard').classList.add('section-hidden');
             document.getElementById('section-promociones').classList.add('section-hidden');
             document.getElementById('section-sucursales').classList.add('section-hidden');
 
-            // Remover clase activa de todos los tabs
             document.getElementById('tab-dashboard').classList.remove('tab-active');
             document.getElementById('tab-promociones').classList.remove('tab-active');
             document.getElementById('tab-sucursales').classList.remove('tab-active');
 
-            // Mostrar sección seleccionada
             document.getElementById(`section-${seccion}`).classList.remove('section-hidden');
             document.getElementById(`tab-${seccion}`).classList.add('tab-active');
         }
@@ -406,7 +530,6 @@
                 return;
             }
 
-            // Calcular paginación
             const totalPaginas = Math.ceil(promocionesFiltradas.length / itemsPorPagina);
             const inicio = (paginaActual - 1) * itemsPorPagina;
             const fin = inicio + itemsPorPagina;
@@ -443,10 +566,8 @@
                 `;
             }).join('');
 
-            // Info de paginación
             document.getElementById('infoPromos').textContent = `Mostrando ${inicio + 1} - ${Math.min(fin, promocionesFiltradas.length)} de ${promocionesFiltradas.length} promociones`;
 
-            // Botones de paginación
             let paginacionHTML = '';
             if (paginaActual > 1) {
                 paginacionHTML += `<button onclick="cambiarPagina(${paginaActual - 1})" class="px-3 py-1 border rounded hover:bg-gray-100">Anterior</button>`;
@@ -518,8 +639,12 @@
 
         function llenarSelectSucursales() {
             const select = document.getElementById('filtroSucursal');
-            select.innerHTML = '<option value="">Todas las sucursales</option>' +
-                sucursales.map(s => `<option value="${s.id_sucursal}">${s.nombre_sucursal}</option>`).join('');
+            if (select) {
+                const valorActual = select.value;
+                select.innerHTML = '<option value="">Todas las sucursales</option>' +
+                    sucursales.map(s => `<option value="${s.id_sucursal}">${s.nombre_sucursal}</option>`).join('');
+                select.value = valorActual;
+            }
         }
 
         function llenarCheckboxesSucursales(sucursalesSeleccionadas = []) {
@@ -586,7 +711,7 @@
             const sucursalesSeleccionadas = Array.from(document.querySelectorAll('input[name="sucursales"]:checked')).map(cb => parseInt(cb.value));
 
             if (sucursalesSeleccionadas.length === 0) {
-                alert('⚠️ Selecciona al menos una sucursal');
+                mostrarToast('Selecciona al menos una sucursal', 'warning');
                 return;
             }
 
@@ -594,7 +719,6 @@
                 let idPromocion;
 
                 if (idEditar) {
-                    // EDITAR promoción existente
                     await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${idEditar}`, {
                         method: 'PATCH',
                         headers,
@@ -602,13 +726,11 @@
                     });
                     idPromocion = parseInt(idEditar);
 
-                    // Eliminar relaciones anteriores
                     await fetch(`${SUPABASE_URL}/sucursal_promocion?id_promocion=eq.${idPromocion}`, {
                         method: 'DELETE',
                         headers
                     });
                 } else {
-                    // CREAR nueva promoción
                     const responsePromo = await fetch(`${SUPABASE_URL}/promociones`, {
                         method: 'POST',
                         headers,
@@ -618,7 +740,6 @@
                     idPromocion = nuevaPromo.id_promocion;
                 }
 
-                // Crear las relaciones
                 const relacionesNuevas = sucursalesSeleccionadas.map(id_suc => ({
                     id_sucursal: id_suc,
                     id_promocion: idPromocion
@@ -630,12 +751,12 @@
                     body: JSON.stringify(relacionesNuevas)
                 });
 
-                alert(idEditar ? '✅ Promoción actualizada' : '✅ Promoción creada');
+                mostrarToast(idEditar ? 'Promoción actualizada correctamente' : 'Promoción creada correctamente', 'success');
                 cerrarModalPromocion();
                 await cargarDatos();
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error al guardar la promoción');
+                mostrarToast('Error al guardar la promoción', 'error');
             }
         }
 
@@ -647,9 +768,10 @@
                     body: JSON.stringify({ activa: !estadoActual })
                 });
                 await cargarDatos();
+                mostrarToast(`Promoción ${!estadoActual ? 'activada' : 'desactivada'}`, 'success');
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error al cambiar estado');
+                mostrarToast('Error al cambiar estado', 'error');
             }
         }
 
@@ -661,15 +783,14 @@
                     method: 'DELETE',
                     headers
                 });
-                alert('✅ Promoción eliminada');
+                mostrarToast('Promoción eliminada correctamente', 'success');
                 await cargarDatos();
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error al eliminar');
+                mostrarToast('Error al eliminar', 'error');
             }
         }
 
-        // CRUD SUCURSALES
         function mostrarFormNuevaSucursal() {
             document.getElementById('tituloModalSucursal').textContent = '➕ Nueva Sucursal';
             document.getElementById('idSucursalEditar').value = '';
@@ -716,65 +837,42 @@
                         headers,
                         body: JSON.stringify(datos)
                     });
-                    alert('✅ Sucursal actualizada');
+                    mostrarToast('Sucursal actualizada correctamente', 'success');
                 } else {
                     await fetch(`${SUPABASE_URL}/sucursales`, {
                         method: 'POST',
                         headers,
                         body: JSON.stringify(datos)
                     });
-                    alert('✅ Sucursal creada');
+                    mostrarToast('Sucursal creada correctamente', 'success');
                 }
 
                 cerrarModalSucursal();
                 await cargarDatos();
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error al guardar sucursal');
+                mostrarToast('Error al guardar sucursal', 'error');
             }
         }
 
         async function eliminarSucursal(id) {
-            if (!confirm('⚠️ ¿Eliminar esta sucursal? Se eliminarán sus relaciones con promociones.')) return;
+            if (!confirm('⚠️ ¿Eliminar esta sucursal?')) return;
 
             try {
                 await fetch(`${SUPABASE_URL}/sucursales?id_sucursal=eq.${id}`, {
                     method: 'DELETE',
                     headers
                 });
-                alert('✅ Sucursal eliminada');
+                mostrarToast('Sucursal eliminada correctamente', 'success');
                 await cargarDatos();
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error al eliminar');
+                mostrarToast('Error al eliminar', 'error');
             }
         }
 
         function filtrarPromociones() {
-            const sucursalId = document.getElementById('filtroSucursal').value;
-            const estado = document.getElementById('filtroEstado').value;
-            const busqueda = document.getElementById('buscarPromo').value.toLowerCase();
-
-            promocionesFiltradas = promociones.filter(promo => {
-                if (sucursalId) {
-                    const tieneRelacion = relaciones.some(r => 
-                        r.id_promocion === promo.id_promocion && 
-                        r.id_sucursal == sucursalId
-                    );
-                    if (!tieneRelacion) return false;
-                }
-
-                if (estado !== '') {
-                    if (promo.activa.toString() !== estado) return false;
-                }
-
-                if (busqueda) {
-                    if (!promo.descripcion.toLowerCase().includes(busqueda)) return false;
-                }
-
-                return true;
-            });
-
+            aplicarFiltrosActuales();
             paginaActual = 1;
             renderizarTablaPromociones();
         }
