@@ -172,35 +172,87 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
-                        <textarea id="descripcion" required class="w-full border border-gray-300 rounded-lg px-4 py-2" rows="3"></textarea>
+                        <textarea id="descripcion" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3"></textarea>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Precio</label>
-                        <input type="number" id="precio" step="0.01" required class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        <input type="number" id="precio" step="0.01" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
-                        <select id="activa" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        <select id="activa" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <option value="true">Activa</option>
                             <option value="false">Inactiva</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Asignar a Sucursales</label>
-                        <div id="checkboxesSucursales" class="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-4">
+                        <div class="flex gap-2 mb-2">
+                            <button type="button" onclick="seleccionarTodasSucursales()" class="text-sm text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-check-square"></i> Seleccionar todas
+                            </button>
+                            <button type="button" onclick="deseleccionarTodasSucursales()" class="text-sm text-gray-600 hover:text-gray-800">
+                                <i class="fas fa-square"></i> Deseleccionar todas
+                            </button>
+                        </div>
+                        <div id="checkboxesSucursales" class="space-y-2 max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
                             <!-- Se llenan dinámicamente -->
                         </div>
                     </div>
                 </div>
                 <div class="flex gap-4 mt-6">
                     <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition">
-                        Guardar Promoción
+                        <i class="fas fa-save"></i> Guardar Promoción
                     </button>
                     <button type="button" onclick="cerrarModal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium transition">
-                        Cancelar
+                        <i class="fas fa-times"></i> Cancelar
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal Editar Sucursales de Promoción -->
+    <div id="modalEditarSucursales" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800">🏥 Gestionar Sucursales</h3>
+                    <p class="text-sm text-gray-500 mt-1" id="nombrePromoEditar"></p>
+                </div>
+                <button onclick="cerrarModalEditarSucursales()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+
+            <div class="mb-4 p-4 bg-blue-50 rounded-lg">
+                <p class="text-sm text-blue-800">
+                    <i class="fas fa-info-circle"></i> 
+                    Selecciona las sucursales donde quieres que aparezca esta promoción
+                </p>
+            </div>
+
+            <div class="flex gap-2 mb-4">
+                <button type="button" onclick="seleccionarTodasEditar()" class="text-sm text-blue-600 hover:text-blue-800">
+                    <i class="fas fa-check-square"></i> Seleccionar todas
+                </button>
+                <button type="button" onclick="deseleccionarTodasEditar()" class="text-sm text-gray-600 hover:text-gray-800">
+                    <i class="fas fa-square"></i> Deseleccionar todas
+                </button>
+            </div>
+
+            <div id="checkboxesSucursalesEditar" class="space-y-2 max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <!-- Se llenan dinámicamente -->
+            </div>
+
+            <div class="flex gap-4 mt-6">
+                <button onclick="guardarSucursalesPromocion()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+                <button onclick="cerrarModalEditarSucursales()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium transition">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
         </div>
     </div>
 
@@ -220,6 +272,7 @@
         let sucursales = [];
         let relaciones = [];
         let promocionesFiltradas = [];
+        let promocionEditando = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             cargarDatos();
@@ -240,18 +293,17 @@
         }
 
         async function cargarSucursales() {
-            const response = await fetch(`${SUPABASE_URL}/promociones?select=*&order=id_promocion.desc`, { headers });
+            const response = await fetch(`${SUPABASE_URL}/sucursales?select=*`, { headers });
             sucursales = await response.json();
             llenarSelectSucursales();
             llenarCheckboxesSucursales();
         }
 
         async function cargarPromociones() {
-        const response = await fetch(`${SUPABASE_URL}/promociones?select=*`, { headers });
-        promociones = await response.json();
-        promocionesFiltradas = [...promociones];
+            const response = await fetch(`${SUPABASE_URL}/promociones?select=*`, { headers });
+            promociones = await response.json();
+            promocionesFiltradas = [...promociones];
         }
-
 
         async function cargarRelaciones() {
             const response = await fetch(`${SUPABASE_URL}/sucursal_promocion?select=*`, { headers });
@@ -281,24 +333,37 @@
 
             tbody.innerHTML = promocionesFiltradas.map(promo => {
                 const sucursalesAsignadas = relaciones.filter(r => r.id_promocion === promo.id_promocion);
+                const nombresSucursales = sucursalesAsignadas.map(r => {
+                    const suc = sucursales.find(s => s.id_sucursal === r.id_sucursal);
+                    return suc ? suc.nombre_sucursal : '';
+                }).filter(n => n);
 
                 return `
-                    <tr>
+                    <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 text-sm text-gray-900">${promo.descripcion.substring(0, 80)}${promo.descripcion.length > 80 ? '...' : ''}</td>
                         <td class="px-6 py-4 text-sm font-semibold text-green-600">$${Number(promo.precio).toFixed(2)}</td>
                         <td class="px-6 py-4">
                             <span class="px-2 py-1 text-xs rounded-full ${promo.activa ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                                ${promo.activa ? 'Activa' : 'Inactiva'}
+                                ${promo.activa ? '✓ Activa' : '✗ Inactiva'}
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">${sucursalesAsignadas.length} sucursales</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-semibold text-blue-600">${sucursalesAsignadas.length}</span>
+                                <button onclick="editarSucursalesPromocion(${promo.id_promocion})" 
+                                        class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 rounded transition"
+                                        title="Gestionar sucursales">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                            </div>
+                        </td>
                         <td class="px-6 py-4 flex gap-2">
                             <button onclick="toggleEstadoPromo(${promo.id_promocion}, ${promo.activa})" 
-                                    class="text-blue-600 hover:text-blue-800" title="Cambiar estado">
+                                    class="text-blue-600 hover:text-blue-800 text-lg" title="Cambiar estado">
                                 <i class="fas fa-toggle-${promo.activa ? 'on' : 'off'}"></i>
                             </button>
                             <button onclick="eliminarPromo(${promo.id_promocion})" 
-                                    class="text-red-600 hover:text-red-800" title="Eliminar">
+                                    class="text-red-600 hover:text-red-800 text-lg" title="Eliminar">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
@@ -310,7 +375,7 @@
         function renderizarTablaSucursales() {
             const tbody = document.getElementById('tablaSucursales');
             tbody.innerHTML = sucursales.map(suc => `
-                <tr>
+                <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4 text-sm font-medium text-gray-900">${suc.nombre_sucursal}</td>
                     <td class="px-6 py-4 text-sm text-gray-600">${suc.ciudad || '-'}</td>
                     <td class="px-6 py-4 text-sm text-gray-600">${suc.telefono || '-'}</td>
@@ -329,7 +394,7 @@
                 }).length;
 
                 return `
-                    <tr>
+                    <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 text-sm font-medium text-gray-900">${suc.nombre_sucursal}</td>
                         <td class="px-6 py-4 text-sm text-gray-600">${suc.ciudad || '-'}</td>
                         <td class="px-6 py-4 text-sm font-semibold text-blue-600">${promosEnSucursal.length}</td>
@@ -354,11 +419,31 @@
         function llenarCheckboxesSucursales() {
             const container = document.getElementById('checkboxesSucursales');
             container.innerHTML = sucursales.map(s => `
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
-                    <input type="checkbox" name="sucursales" value="${s.id_sucursal}" class="form-checkbox h-4 w-4 text-blue-600">
-                    <span class="text-sm">${s.nombre_sucursal} - ${s.ciudad}</span>
+                <label class="flex items-center space-x-3 cursor-pointer hover:bg-white p-3 rounded-lg transition group">
+                    <input type="checkbox" name="sucursales" value="${s.id_sucursal}" 
+                           class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
+                    <div class="flex-1">
+                        <span class="text-sm font-medium text-gray-900 group-hover:text-blue-600">${s.nombre_sucursal}</span>
+                        <span class="text-xs text-gray-500 ml-2">${s.ciudad}</span>
+                    </div>
                 </label>
             `).join('');
+        }
+
+        function seleccionarTodasSucursales() {
+            document.querySelectorAll('#checkboxesSucursales input[type="checkbox"]').forEach(cb => cb.checked = true);
+        }
+
+        function deseleccionarTodasSucursales() {
+            document.querySelectorAll('#checkboxesSucursales input[type="checkbox"]').forEach(cb => cb.checked = false);
+        }
+
+        function seleccionarTodasEditar() {
+            document.querySelectorAll('#checkboxesSucursalesEditar input[type="checkbox"]').forEach(cb => cb.checked = true);
+        }
+
+        function deseleccionarTodasEditar() {
+            document.querySelectorAll('#checkboxesSucursalesEditar input[type="checkbox"]').forEach(cb => cb.checked = false);
         }
 
         function mostrarFormNuevaPromocion() {
@@ -370,6 +455,75 @@
             document.getElementById('formNuevaPromo').reset();
         }
 
+        function editarSucursalesPromocion(idPromocion) {
+            promocionEditando = promociones.find(p => p.id_promocion === idPromocion);
+            if (!promocionEditando) return;
+
+            document.getElementById('nombrePromoEditar').textContent = promocionEditando.descripcion.substring(0, 60) + '...';
+
+            // Llenar checkboxes con sucursales actuales marcadas
+            const relacionesActuales = relaciones.filter(r => r.id_promocion === idPromocion).map(r => r.id_sucursal);
+            const container = document.getElementById('checkboxesSucursalesEditar');
+            container.innerHTML = sucursales.map(s => {
+                const checked = relacionesActuales.includes(s.id_sucursal) ? 'checked' : '';
+                return `
+                    <label class="flex items-center space-x-3 cursor-pointer hover:bg-white p-3 rounded-lg transition group">
+                        <input type="checkbox" name="sucursalesEditar" value="${s.id_sucursal}" ${checked}
+                               class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
+                        <div class="flex-1">
+                            <span class="text-sm font-medium text-gray-900 group-hover:text-blue-600">${s.nombre_sucursal}</span>
+                            <span class="text-xs text-gray-500 ml-2">${s.ciudad}</span>
+                        </div>
+                    </label>
+                `;
+            }).join('');
+
+            document.getElementById('modalEditarSucursales').classList.remove('hidden');
+        }
+
+        function cerrarModalEditarSucursales() {
+            document.getElementById('modalEditarSucursales').classList.add('hidden');
+            promocionEditando = null;
+        }
+
+        async function guardarSucursalesPromocion() {
+            if (!promocionEditando) return;
+
+            const sucursalesSeleccionadas = Array.from(document.querySelectorAll('input[name="sucursalesEditar"]:checked')).map(cb => parseInt(cb.value));
+
+            if (sucursalesSeleccionadas.length === 0) {
+                alert('⚠️ Debes seleccionar al menos una sucursal');
+                return;
+            }
+
+            try {
+                // 1. Eliminar todas las relaciones actuales de esta promoción
+                await fetch(`${SUPABASE_URL}/sucursal_promocion?id_promocion=eq.${promocionEditando.id_promocion}`, {
+                    method: 'DELETE',
+                    headers
+                });
+
+                // 2. Crear las nuevas relaciones
+                const relacionesNuevas = sucursalesSeleccionadas.map(id_suc => ({
+                    id_sucursal: id_suc,
+                    id_promocion: promocionEditando.id_promocion
+                }));
+
+                await fetch(`${SUPABASE_URL}/sucursal_promocion`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(relacionesNuevas)
+                });
+
+                alert('✅ Sucursales actualizadas exitosamente');
+                cerrarModalEditarSucursales();
+                await cargarDatos();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al actualizar sucursales');
+            }
+        }
+
         async function guardarPromocion(event) {
             event.preventDefault();
 
@@ -379,7 +533,7 @@
             const sucursalesSeleccionadas = Array.from(document.querySelectorAll('input[name="sucursales"]:checked')).map(cb => parseInt(cb.value));
 
             if (sucursalesSeleccionadas.length === 0) {
-                alert('Selecciona al menos una sucursal');
+                alert('⚠️ Selecciona al menos una sucursal');
                 return;
             }
 
@@ -409,7 +563,7 @@
                 await cargarDatos();
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al guardar la promoción');
+                alert('❌ Error al guardar la promoción');
             }
         }
 
@@ -423,22 +577,23 @@
                 await cargarDatos();
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al cambiar estado');
+                alert('❌ Error al cambiar estado');
             }
         }
 
         async function eliminarPromo(id) {
-            if (!confirm('¿Eliminar esta promoción? Se eliminarán también sus asignaciones a sucursales.')) return;
+            if (!confirm('⚠️ ¿Eliminar esta promoción? Se eliminarán también sus asignaciones a sucursales.')) return;
 
             try {
                 await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${id}`, {
                     method: 'DELETE',
                     headers
                 });
+                alert('✅ Promoción eliminada');
                 await cargarDatos();
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al eliminar');
+                alert('❌ Error al eliminar');
             }
         }
 
@@ -448,7 +603,6 @@
             const busqueda = document.getElementById('buscarPromo').value.toLowerCase();
 
             promocionesFiltradas = promociones.filter(promo => {
-                // Filtro por sucursal
                 if (sucursalId) {
                     const tieneRelacion = relaciones.some(r => 
                         r.id_promocion === promo.id_promocion && 
@@ -457,12 +611,10 @@
                     if (!tieneRelacion) return false;
                 }
 
-                // Filtro por estado
                 if (estado !== '') {
                     if (promo.activa.toString() !== estado) return false;
                 }
 
-                // Filtro por búsqueda
                 if (busqueda) {
                     if (!promo.descripcion.toLowerCase().includes(busqueda)) return false;
                 }
