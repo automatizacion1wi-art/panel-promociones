@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Promociones DX-RAY</title>
+    <title>Dashboard - Promociones DX-RAY v2.1</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦷</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -47,39 +47,33 @@
         }
 
         @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(400px);
-                opacity: 0;
-            }
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
         }
 
         .toast.hiding {
             animation: slideOut 0.3s ease-out forwards;
         }
 
-        .badge-vencida {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        .badge-reportada {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
             color: white;
             padding: 2px 8px;
             border-radius: 4px;
             font-size: 10px;
             font-weight: 600;
             margin-left: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
         .sin-horario {
@@ -89,6 +83,14 @@
             border-radius: 4px;
             font-size: 10px;
             font-weight: 600;
+        }
+
+        .mensualidad-field {
+            display: none;
+        }
+
+        .mensualidad-field.show {
+            display: block;
         }
     </style>
 </head>
@@ -136,7 +138,7 @@
             <!-- SECCIÓN: DASHBOARD -->
             <div id="section-dashboard">
                 <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
                     <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
                         <div class="flex items-center justify-between">
                             <div>
@@ -152,7 +154,7 @@
                     <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-gray-500 text-sm font-medium">Promociones Activas</p>
+                                <p class="text-gray-500 text-sm font-medium">Activas</p>
                                 <p class="text-3xl font-bold text-gray-800" id="promosActivas">0</p>
                             </div>
                             <div class="bg-green-100 rounded-full p-3">
@@ -161,14 +163,26 @@
                         </div>
                     </div>
 
+                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-medium">En Proceso</p>
+                                <p class="text-3xl font-bold text-gray-800" id="promosEnProceso">0</p>
+                            </div>
+                            <div class="bg-yellow-100 rounded-full p-3">
+                                <i class="fas fa-hourglass-half text-yellow-600 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-gray-500 text-sm font-medium">Promociones Inactivas</p>
-                                <p class="text-3xl font-bold text-gray-800" id="promosInactivas">0</p>
+                                <p class="text-gray-500 text-sm font-medium">Reportadas</p>
+                                <p class="text-3xl font-bold text-gray-800" id="promosReportadas">0</p>
                             </div>
                             <div class="bg-red-100 rounded-full p-3">
-                                <i class="fas fa-times-circle text-red-600 text-2xl"></i>
+                                <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
                             </div>
                         </div>
                     </div>
@@ -195,12 +209,13 @@
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursal</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ciudad</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Promos</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Activas</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">En Proceso</th>
                                 </tr>
                             </thead>
                             <tbody id="tablaSucursalesPromos" class="bg-white divide-y divide-gray-200">
-                                <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
+                                <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -212,10 +227,16 @@
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold text-gray-800">📋 Gestión de Promociones</h3>
-                        <button onclick="mostrarFormNuevaPromocion()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
-                            <i class="fas fa-plus"></i>
-                            Nueva Promoción
-                        </button>
+                        <div class="flex gap-3">
+                            <button onclick="aprobarTodasEnProceso()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                                <i class="fas fa-check-double"></i>
+                                Aprobar Todas
+                            </button>
+                            <button onclick="mostrarFormNuevaPromocion()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                                <i class="fas fa-plus"></i>
+                                Nueva Promoción
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Filtros -->
@@ -225,8 +246,15 @@
                         </select>
                         <select id="filtroEstado" onchange="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2">
                             <option value="">Todos los estados</option>
-                            <option value="true">Activas</option>
-                            <option value="false">Inactivas</option>
+                            <option value="Activa">Activas</option>
+                            <option value="En proceso">En proceso</option>
+                            <option value="Inactiva">Inactivas</option>
+                            <option value="Reportada">Reportadas</option>
+                        </select>
+                        <select id="filtroTipo" onchange="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2">
+                            <option value="">Todos los tipos</option>
+                            <option value="Integrales">Integrales</option>
+                            <option value="Ortodoncia">Ortodoncia</option>
                         </select>
                         <input type="text" id="buscarPromo" placeholder="Buscar promoción..." onkeyup="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2 flex-1 min-w-[200px]">
                     </div>
@@ -247,17 +275,19 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Precio</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vigencia</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Creada</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursales</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
+                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Precio</th>
+                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mensualidad</th>
+                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Medio</th>
+                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estatus</th>
+                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vigencia</th>
+                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursales</th>
+                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tablaPromociones" class="bg-white divide-y divide-gray-200">
-                                <tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
+                                <tr><td colspan="9" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -270,7 +300,7 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN: SUCURSALES -->
+            <!-- SECCIÓN: SUCURSALES (sin cambios) -->
             <div id="section-sucursales" class="section-hidden">
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex justify-between items-center mb-6">
@@ -314,7 +344,7 @@
 
     <!-- Modal Nueva/Editar Promoción -->
     <div id="modalPromocion" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-lg p-8 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-bold text-gray-800" id="tituloModalPromo">➕ Nueva Promoción</h3>
                 <button onclick="cerrarModalPromocion()" class="text-gray-500 hover:text-gray-700">
@@ -324,23 +354,58 @@
             <form id="formPromocion" onsubmit="guardarPromocion(event)">
                 <input type="hidden" id="idPromocionEditar">
                 <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
-                        <textarea id="descripcion" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3"></textarea>
-                    </div>
+                    <!-- Tipo de Promoción -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Precio</label>
-                            <input type="number" id="precio" step="0.01" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
-                            <select id="activa" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="true">Activa</option>
-                                <option value="false">Inactiva</option>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Promoción</label>
+                            <select id="tipoPromocion" onchange="toggleMensualidad()" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                                <option value="Integrales">Integrales</option>
+                                <option value="Ortodoncia">Ortodoncia</option>
                             </select>
                         </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Precio</label>
+                            <input type="number" id="precio" step="0.01" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                        </div>
                     </div>
+
+                    <!-- Mensualidad (solo para Ortodoncia) -->
+                    <div id="campoMensualidad" class="mensualidad-field">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            💳 Mensualidad 
+                            <span class="text-xs text-gray-500">(solo para Ortodoncia)</span>
+                        </label>
+                        <input type="number" id="mensualidad" step="0.01" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <!-- NUEVO: Campo Medio -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            📢 Medio de Difusión
+                        </label>
+                        <select id="medio" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="">Seleccionar medio...</option>
+                            <option value="WhatsApp">WhatsApp</option>
+                            <option value="Facebook">Facebook</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="Email">Email</option>
+                            <option value="Sitio Web">Sitio Web</option>
+                            <option value="Presencial">Presencial</option>
+                            <option value="Volante">Volante</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                        <textarea id="descripcion" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Términos y Condiciones</label>
+                        <textarea id="terminosCondiciones" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Términos y condiciones de la promoción..."></textarea>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -355,10 +420,16 @@
                             <input type="date" id="fechaFin" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
                         </div>
                     </div>
-                    <div class="text-xs text-gray-500 bg-blue-50 p-3 rounded">
-                        <i class="fas fa-info-circle text-blue-600"></i> 
-                        <strong>Nota:</strong> Si estableces fecha de fin, la promoción se desactivará automáticamente al pasar esa fecha.
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Estatus</label>
+                        <select id="estatus" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="En proceso">En proceso</option>
+                            <option value="Activa">Activa</option>
+                            <option value="Inactiva">Inactiva</option>
+                        </select>
                     </div>
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Asignar a Sucursales</label>
                         <div class="flex gap-2 mb-2">
@@ -385,7 +456,7 @@
         </div>
     </div>
 
-    <!-- Modal Nueva/Editar Sucursal -->
+    <!-- Modal Nueva/Editar Sucursal (sin cambios) -->
     <div id="modalSucursal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
         <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4">
             <div class="flex justify-between items-center mb-6">
@@ -449,9 +520,8 @@
         const SUPABASE_URL = 'https://sdqmuabsdsghptbttwiy.supabase.co/rest/v1';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkcW11YWJzZHNnaHB0YnR0d2l5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MTQ2NjMsImV4cCI6MjA4NTk5MDY2M30.Ki1AazQ5A7QcQuA0wUOjujGAGn1k749VRK2qoD7vNR0';
 
-        // 🔧 CONFIGURA AQUÍ TU TOKEN DE DENTALINK
         const DENTALINK_API_URL = 'https://api.dentalink.healthatom.com/api/v1/sucursales';
-        const DENTALINK_TOKEN = 'uLDY8zgT9Oa10nDXSr8PPCou8MFT4BPNjwlYMcEX.c24YdKRkDONJW7nXcdQhx6VLEvsbxVFWia4FXmXh'; // ⚠️ Coloca aquí tu token de Dentalink
+        const DENTALINK_TOKEN = ''; // ⚠️ Coloca aquí tu token
 
         const headers = {
             'apikey': SUPABASE_KEY,
@@ -472,6 +542,35 @@
             setInterval(verificarPromocionesVencidas, 60000);
         });
 
+        function toggleMensualidad() {
+            const tipo = document.getElementById('tipoPromocion').value;
+            const campoMensualidad = document.getElementById('campoMensualidad');
+            const inputMensualidad = document.getElementById('mensualidad');
+
+            if (tipo === 'Ortodoncia') {
+                campoMensualidad.classList.add('show');
+                inputMensualidad.required = true;
+            } else {
+                campoMensualidad.classList.remove('show');
+                inputMensualidad.required = false;
+                inputMensualidad.value = '';
+            }
+        }
+
+        function getMedioIcon(medio) {
+            const iconos = {
+                'WhatsApp': '💬',
+                'Facebook': '📘',
+                'Instagram': '📸',
+                'Email': '📧',
+                'Sitio Web': '🌐',
+                'Presencial': '🏢',
+                'Volante': '📄',
+                'Otro': '📢'
+            };
+            return iconos[medio] || '📢';
+        }
+
         function mostrarToast(mensaje, tipo = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast toast-${tipo}`;
@@ -483,11 +582,7 @@
                 info: '<i class="fas fa-info-circle text-2xl"></i>'
             };
 
-            toast.innerHTML = `
-                ${iconos[tipo]}
-                <span class="font-medium">${mensaje}</span>
-            `;
-
+            toast.innerHTML = `${iconos[tipo]}<span class="font-medium">${mensaje}</span>`;
             document.body.appendChild(toast);
 
             setTimeout(() => {
@@ -499,9 +594,7 @@
         async function recargarDatos() {
             const icon = document.getElementById('iconRecargar');
             icon.classList.add('fa-spin');
-
             await cargarDatos();
-
             setTimeout(() => {
                 icon.classList.remove('fa-spin');
                 mostrarToast('Datos actualizados correctamente', 'success');
@@ -544,12 +637,12 @@
             let desactivadas = 0;
 
             for (const promo of promociones) {
-                if (promo.activa && promo.fecha_fin && promo.fecha_fin < hoy) {
+                if (promo.estatus === 'Activa' && promo.fecha_fin && promo.fecha_fin < hoy) {
                     try {
                         await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${promo.id_promocion}`, {
                             method: 'PATCH',
                             headers,
-                            body: JSON.stringify({ activa: false })
+                            body: JSON.stringify({ estatus: 'Inactiva' })
                         });
                         desactivadas++;
                     } catch (error) {
@@ -564,7 +657,6 @@
             }
         }
 
-        // 🔄 SINCRONIZACIÓN CON DENTALINK - HORARIOS NO SE ACTUALIZAN
         async function sincronizarDentalink() {
             if (!DENTALINK_TOKEN) {
                 mostrarToast('⚠️ Configura el token de Dentalink en el código', 'error');
@@ -592,20 +684,18 @@
 
                 let nuevas = 0;
                 let actualizadas = 0;
-                let sinHorario = 0;
 
                 for (const sucDental of sucursalesDentalink) {
                     const existe = sucursales.find(s => s.id_sucursal === sucDental.id);
 
                     if (!existe) {
-                        // ✅ NUEVA SUCURSAL - se crea con horarios = NULL
                         const datos = {
                             id_sucursal: sucDental.id,
                             nombre_sucursal: sucDental.nombre,
                             ciudad: sucDental.ciudad || sucDental.comuna || 'Sin ciudad',
                             direccion: sucDental.direccion,
                             telefono: sucDental.telefono,
-                            horarios: null, // NULL - se debe agregar manualmente desde el dashboard
+                            horarios: null,
                             activa: sucDental.habilitada === 1
                         };
 
@@ -615,16 +705,13 @@
                             body: JSON.stringify(datos)
                         });
                         nuevas++;
-                        sinHorario++;
                     } else {
-                        // 🔄 ACTUALIZACIÓN - horarios NO se toca, solo otros campos
                         const datosActualizar = {
                             nombre_sucursal: sucDental.nombre,
                             ciudad: sucDental.ciudad || sucDental.comuna || 'Sin ciudad',
                             direccion: sucDental.direccion,
                             telefono: sucDental.telefono,
                             activa: sucDental.habilitada === 1
-                            // ⚠️ horarios NO se incluye en la actualización
                         };
 
                         await fetch(`${SUPABASE_URL}/sucursales?id_sucursal=eq.${sucDental.id}`, {
@@ -638,14 +725,7 @@
 
                 await cargarDatos();
                 icon.classList.remove('fa-spin');
-
-                let mensaje = `Sync completado: ${nuevas} nuevas, ${actualizadas} actualizadas`;
-                if (sinHorario > 0) {
-                    mensaje += `. ⚠️ ${sinHorario} sucursal(es) sin horario`;
-                    mostrarToast(mensaje, 'warning');
-                } else {
-                    mostrarToast(mensaje, 'success');
-                }
+                mostrarToast(`Sync completado: ${nuevas} nuevas, ${actualizadas} actualizadas`, 'success');
 
             } catch (error) {
                 console.error('Error en sync:', error);
@@ -657,6 +737,7 @@
         function aplicarFiltrosActuales() {
             const sucursalId = document.getElementById('filtroSucursal')?.value || '';
             const estado = document.getElementById('filtroEstado')?.value || '';
+            const tipo = document.getElementById('filtroTipo')?.value || '';
             const busqueda = document.getElementById('buscarPromo')?.value.toLowerCase() || '';
 
             promocionesFiltradas = promociones.filter(promo => {
@@ -668,13 +749,9 @@
                     if (!tieneRelacion) return false;
                 }
 
-                if (estado !== '') {
-                    if (promo.activa.toString() !== estado) return false;
-                }
-
-                if (busqueda) {
-                    if (!promo.descripcion.toLowerCase().includes(busqueda)) return false;
-                }
+                if (estado && promo.estatus !== estado) return false;
+                if (tipo && promo.tipo_promocion !== tipo) return false;
+                if (busqueda && !promo.descripcion.toLowerCase().includes(busqueda)) return false;
 
                 return true;
             });
@@ -689,21 +766,19 @@
 
         function actualizarStats() {
             document.getElementById('totalPromos').textContent = promociones.length;
-            document.getElementById('promosActivas').textContent = promociones.filter(p => p.activa).length;
-            document.getElementById('promosInactivas').textContent = promociones.filter(p => !p.activa).length;
+            document.getElementById('promosActivas').textContent = promociones.filter(p => p.estatus === 'Activa').length;
+            document.getElementById('promosEnProceso').textContent = promociones.filter(p => p.estatus === 'En proceso').length;
+            document.getElementById('promosReportadas').textContent = promociones.filter(p => p.estatus === 'Reportada').length;
             document.getElementById('totalSucursales').textContent = sucursales.filter(s => s.activa !== false).length;
         }
 
         function cambiarSeccion(seccion) {
             cargarDatos();
 
-            document.getElementById('section-dashboard').classList.add('section-hidden');
-            document.getElementById('section-promociones').classList.add('section-hidden');
-            document.getElementById('section-sucursales').classList.add('section-hidden');
-
-            document.getElementById('tab-dashboard').classList.remove('tab-active');
-            document.getElementById('tab-promociones').classList.remove('tab-active');
-            document.getElementById('tab-sucursales').classList.remove('tab-active');
+            ['dashboard', 'promociones', 'sucursales'].forEach(s => {
+                document.getElementById(`section-${s}`).classList.add('section-hidden');
+                document.getElementById(`tab-${s}`).classList.remove('tab-active');
+            });
 
             document.getElementById(`section-${seccion}`).classList.remove('section-hidden');
             document.getElementById(`tab-${seccion}`).classList.add('tab-active');
@@ -727,16 +802,30 @@
             return fecha.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
         }
 
-        function estaVencida(fechaFin) {
-            if (!fechaFin) return false;
-            const hoy = new Date().toISOString().split('T')[0];
-            return fechaFin < hoy;
+        function getEstatusBadge(estatus) {
+            const badges = {
+                'Activa': 'bg-green-100 text-green-800',
+                'Inactiva': 'bg-gray-100 text-gray-800',
+                'En proceso': 'bg-yellow-100 text-yellow-800',
+                'Reportada': 'bg-red-100 text-red-800'
+            };
+            return badges[estatus] || 'bg-gray-100 text-gray-800';
+        }
+
+        function getEstatusIcon(estatus) {
+            const icons = {
+                'Activa': '✓',
+                'Inactiva': '✗',
+                'En proceso': '⏳',
+                'Reportada': '⚠️'
+            };
+            return icons[estatus] || '?';
         }
 
         function renderizarTablaPromociones() {
             const tbody = document.getElementById('tablaPromociones');
             if (promocionesFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">No hay promociones</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" class="px-6 py-4 text-center text-gray-500">No hay promociones</td></tr>';
                 document.getElementById('infoPromos').textContent = '';
                 document.getElementById('paginacionPromos').innerHTML = '';
                 return;
@@ -749,39 +838,56 @@
 
             tbody.innerHTML = promosPagina.map(promo => {
                 const sucursalesAsignadas = relaciones.filter(r => r.id_promocion === promo.id_promocion);
-                const vencida = estaVencida(promo.fecha_fin);
                 const vigencia = promo.fecha_inicio || promo.fecha_fin 
                     ? `${formatearFecha(promo.fecha_inicio)} - ${formatearFecha(promo.fecha_fin)}`
                     : 'Sin límite';
 
                 return `
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 text-sm text-gray-900">
-                            ${promo.descripcion.substring(0, 50)}${promo.descripcion.length > 50 ? '...' : ''}
-                            ${vencida && promo.activa ? '<span class="badge-vencida">VENCIDA</span>' : ''}
+                    <tr class="hover:bg-gray-50 ${promo.estatus === 'Reportada' ? 'bg-red-50' : ''}">
+                        <td class="px-3 py-4 text-xs font-semibold ${promo.tipo_promocion === 'Ortodoncia' ? 'text-purple-600' : 'text-blue-600'}">
+                            ${promo.tipo_promocion}
                         </td>
-                        <td class="px-6 py-4 text-sm font-semibold text-green-600">$${Number(promo.precio).toFixed(2)}</td>
-                        <td class="px-6 py-4">
-                            <span class="px-2 py-1 text-xs rounded-full ${promo.activa ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                                ${promo.activa ? '✓ Activa' : '✗ Inactiva'}
+                        <td class="px-3 py-4 text-sm text-gray-900">
+                            ${promo.descripcion.substring(0, 35)}${promo.descripcion.length > 35 ? '...' : ''}
+                            ${promo.estatus === 'Reportada' ? '<span class="badge-reportada">REPORTADA</span>' : ''}
+                        </td>
+                        <td class="px-3 py-4 text-sm font-semibold text-green-600">$${Number(promo.precio).toFixed(2)}</td>
+                        <td class="px-3 py-4 text-sm text-purple-600">
+                            ${promo.mensualidad ? '$' + Number(promo.mensualidad).toFixed(2) : '-'}
+                        </td>
+                        <td class="px-3 py-4 text-xs">
+                            ${promo.medio ? getMedioIcon(promo.medio) + ' ' + promo.medio : '-'}
+                        </td>
+                        <td class="px-3 py-4">
+                            <span class="px-2 py-1 text-xs rounded-full ${getEstatusBadge(promo.estatus)}">
+                                ${getEstatusIcon(promo.estatus)} ${promo.estatus}
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-xs text-gray-600">${vigencia}</td>
-                        <td class="px-6 py-4 text-xs text-gray-500">${formatearFechaCreacion(promo.created_at)}</td>
-                        <td class="px-6 py-4 text-sm font-semibold text-blue-600">${sucursalesAsignadas.length}</td>
-                        <td class="px-6 py-4 flex gap-2">
-                            <button onclick="editarPromocion(${promo.id_promocion})" 
-                                    class="text-blue-600 hover:text-blue-800 text-lg" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="toggleEstadoPromo(${promo.id_promocion}, ${promo.activa})" 
-                                    class="text-orange-600 hover:text-orange-800 text-lg" title="Cambiar estado">
-                                <i class="fas fa-toggle-${promo.activa ? 'on' : 'off'}"></i>
-                            </button>
-                            <button onclick="eliminarPromo(${promo.id_promocion})" 
-                                    class="text-red-600 hover:text-red-800 text-lg" title="Eliminar">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                        <td class="px-3 py-4 text-xs text-gray-600">${vigencia}</td>
+                        <td class="px-3 py-4 text-sm font-semibold text-blue-600">${sucursalesAsignadas.length}</td>
+                        <td class="px-3 py-4">
+                            <div class="flex gap-1">
+                                <button onclick="editarPromocion(${promo.id_promocion})" 
+                                        class="text-blue-600 hover:text-blue-800" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                ${promo.estatus === 'En proceso' ? `
+                                    <button onclick="cambiarEstatusPromo(${promo.id_promocion}, 'Activa')" 
+                                            class="text-green-600 hover:text-green-800" title="Aprobar">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                ` : ''}
+                                ${promo.estatus !== 'Reportada' ? `
+                                    <button onclick="reportarPromocion(${promo.id_promocion})" 
+                                            class="text-red-600 hover:text-red-800" title="Reportar">
+                                        <i class="fas fa-flag"></i>
+                                    </button>
+                                ` : ''}
+                                <button onclick="eliminarPromo(${promo.id_promocion})" 
+                                        class="text-gray-600 hover:text-gray-800" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -811,6 +917,70 @@
         function cambiarPagina(pagina) {
             paginaActual = pagina;
             renderizarTablaPromociones();
+        }
+
+        async function aprobarTodasEnProceso() {
+            const promosEnProceso = promociones.filter(p => p.estatus === 'En proceso');
+
+            if (promosEnProceso.length === 0) {
+                mostrarToast('No hay promociones en proceso', 'info');
+                return;
+            }
+
+            if (!confirm(`¿Aprobar ${promosEnProceso.length} promoción(es) en proceso?`)) return;
+
+            try {
+                for (const promo of promosEnProceso) {
+                    await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${promo.id_promocion}`, {
+                        method: 'PATCH',
+                        headers,
+                        body: JSON.stringify({ estatus: 'Activa' })
+                    });
+                }
+
+                await cargarDatos();
+                mostrarToast(`${promosEnProceso.length} promoción(es) aprobada(s)`, 'success');
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarToast('Error al aprobar promociones', 'error');
+            }
+        }
+
+        async function reportarPromocion(id) {
+            const motivo = prompt('Motivo del reporte (opcional):');
+
+            try {
+                await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${id}`, {
+                    method: 'PATCH',
+                    headers,
+                    body: JSON.stringify({ 
+                        estatus: 'Reportada',
+                        reportada_por: motivo || 'Sin motivo especificado',
+                        fecha_reporte: new Date().toISOString()
+                    })
+                });
+
+                await cargarDatos();
+                mostrarToast('Promoción reportada correctamente', 'warning');
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarToast('Error al reportar promoción', 'error');
+            }
+        }
+
+        async function cambiarEstatusPromo(id, nuevoEstatus) {
+            try {
+                await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${id}`, {
+                    method: 'PATCH',
+                    headers,
+                    body: JSON.stringify({ estatus: nuevoEstatus })
+                });
+                await cargarDatos();
+                mostrarToast(`Promoción marcada como ${nuevoEstatus}`, 'success');
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarToast('Error al cambiar estatus', 'error');
+            }
         }
 
         function renderizarTablaSucursales() {
@@ -863,7 +1033,11 @@
                 const promosEnSucursal = relaciones.filter(r => r.id_sucursal === suc.id_sucursal);
                 const promosActivas = promosEnSucursal.filter(r => {
                     const promo = promociones.find(p => p.id_promocion === r.id_promocion);
-                    return promo && promo.activa;
+                    return promo && promo.estatus === 'Activa';
+                }).length;
+                const promosEnProceso = promosEnSucursal.filter(r => {
+                    const promo = promociones.find(p => p.id_promocion === r.id_promocion);
+                    return promo && promo.estatus === 'En proceso';
                 }).length;
 
                 return `
@@ -872,6 +1046,7 @@
                         <td class="px-6 py-4 text-sm text-gray-600">${suc.ciudad || '-'}</td>
                         <td class="px-6 py-4 text-sm font-semibold text-blue-600">${promosEnSucursal.length}</td>
                         <td class="px-6 py-4 text-sm font-semibold text-green-600">${promosActivas}</td>
+                        <td class="px-6 py-4 text-sm font-semibold text-yellow-600">${promosEnProceso}</td>
                     </tr>
                 `;
             }).join('');
@@ -918,6 +1093,8 @@
             document.getElementById('tituloModalPromo').textContent = '➕ Nueva Promoción';
             document.getElementById('idPromocionEditar').value = '';
             document.getElementById('formPromocion').reset();
+            document.getElementById('estatus').value = 'En proceso';
+            toggleMensualidad();
             llenarCheckboxesSucursales();
             document.getElementById('modalPromocion').classList.remove('hidden');
         }
@@ -933,11 +1110,17 @@
 
             document.getElementById('tituloModalPromo').textContent = '✏️ Editar Promoción';
             document.getElementById('idPromocionEditar').value = promo.id_promocion;
+            document.getElementById('tipoPromocion').value = promo.tipo_promocion || 'Integrales';
             document.getElementById('descripcion').value = promo.descripcion;
             document.getElementById('precio').value = promo.precio;
-            document.getElementById('activa').value = promo.activa.toString();
+            document.getElementById('mensualidad').value = promo.mensualidad || '';
+            document.getElementById('medio').value = promo.medio || '';
+            document.getElementById('terminosCondiciones').value = promo.terminos_condiciones || '';
+            document.getElementById('estatus').value = promo.estatus || 'En proceso';
             document.getElementById('fechaInicio').value = promo.fecha_inicio || '';
             document.getElementById('fechaFin').value = promo.fecha_fin || '';
+
+            toggleMensualidad();
 
             const sucursalesAsignadas = relaciones.filter(r => r.id_promocion === idPromocion).map(r => r.id_sucursal);
             llenarCheckboxesSucursales(sucursalesAsignadas);
@@ -949,9 +1132,13 @@
             event.preventDefault();
 
             const idEditar = document.getElementById('idPromocionEditar').value;
+            const tipoPromocion = document.getElementById('tipoPromocion').value;
             const descripcion = document.getElementById('descripcion').value;
             const precio = parseFloat(document.getElementById('precio').value);
-            const activa = document.getElementById('activa').value === 'true';
+            const mensualidad = tipoPromocion === 'Ortodoncia' ? parseFloat(document.getElementById('mensualidad').value) : null;
+            const medio = document.getElementById('medio').value || null;
+            const terminosCondiciones = document.getElementById('terminosCondiciones').value || null;
+            const estatus = document.getElementById('estatus').value;
             const fechaInicio = document.getElementById('fechaInicio').value || null;
             const fechaFin = document.getElementById('fechaFin').value || null;
             const sucursalesSeleccionadas = Array.from(document.querySelectorAll('input[name="sucursales"]:checked')).map(cb => parseInt(cb.value));
@@ -961,6 +1148,18 @@
                 return;
             }
 
+            const datos = {
+                tipo_promocion: tipoPromocion,
+                descripcion,
+                precio,
+                mensualidad,
+                medio,
+                terminos_condiciones: terminosCondiciones,
+                estatus,
+                fecha_inicio: fechaInicio,
+                fecha_fin: fechaFin
+            };
+
             try {
                 let idPromocion;
 
@@ -968,7 +1167,7 @@
                     await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${idEditar}`, {
                         method: 'PATCH',
                         headers,
-                        body: JSON.stringify({ descripcion, precio, activa, fecha_inicio: fechaInicio, fecha_fin: fechaFin })
+                        body: JSON.stringify(datos)
                     });
                     idPromocion = parseInt(idEditar);
 
@@ -980,7 +1179,7 @@
                     const responsePromo = await fetch(`${SUPABASE_URL}/promociones`, {
                         method: 'POST',
                         headers,
-                        body: JSON.stringify({ descripcion, precio, activa, fecha_inicio: fechaInicio, fecha_fin: fechaFin })
+                        body: JSON.stringify(datos)
                     });
                     const [nuevaPromo] = await responsePromo.json();
                     idPromocion = nuevaPromo.id_promocion;
@@ -1006,21 +1205,6 @@
             }
         }
 
-        async function toggleEstadoPromo(id, estadoActual) {
-            try {
-                await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${id}`, {
-                    method: 'PATCH',
-                    headers,
-                    body: JSON.stringify({ activa: !estadoActual })
-                });
-                await cargarDatos();
-                mostrarToast(`Promoción ${!estadoActual ? 'activada' : 'desactivada'}`, 'success');
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarToast('Error al cambiar estado', 'error');
-            }
-        }
-
         async function eliminarPromo(id) {
             if (!confirm('⚠️ ¿Eliminar esta promoción?')) return;
 
@@ -1036,6 +1220,7 @@
             }
         }
 
+        // Funciones de sucursales (código idéntico al anterior, sin cambios)
         function mostrarFormNuevaSucursal() {
             document.getElementById('tituloModalSucursal').textContent = '➕ Nueva Sucursal';
             document.getElementById('idSucursalEditar').value = '';
