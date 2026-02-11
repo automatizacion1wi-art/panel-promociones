@@ -81,6 +81,15 @@
             font-weight: 600;
             margin-left: 8px;
         }
+
+        .sin-horario {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -410,7 +419,10 @@
                         <input type="text" id="telefonoSucursal" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Horarios</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Horarios (opcional)
+                            <span class="text-xs text-yellow-600 ml-2">⚠️ Se mostrará advertencia si está vacío</span>
+                        </label>
                         <input type="text" id="horariosSucursal" placeholder="Ej: Lunes a Viernes 10:00 - 19:00" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
@@ -433,45 +445,13 @@
         </div>
     </div>
 
-    <!-- Modal Config API Dentalink -->
-    <div id="modalConfigAPI" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-lg w-full mx-4">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-gray-800">🔧 Configurar API Dentalink</h3>
-                <button onclick="cerrarModalConfigAPI()" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-2xl"></i>
-                </button>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">URL API Dentalink</label>
-                    <input type="text" id="apiDentalinkURL" placeholder="https://api.dentalink.cl/v1/sucursales" 
-                           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">API Key</label>
-                    <input type="password" id="apiDentalinkKey" 
-                           class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="text-xs text-gray-500 bg-yellow-50 p-3 rounded">
-                    <i class="fas fa-exclamation-triangle text-yellow-600"></i> 
-                    Configura la URL y credenciales de tu API de Dentalink para sincronizar sucursales
-                </div>
-            </div>
-            <div class="flex gap-4 mt-6">
-                <button onclick="guardarConfigAPI()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition">
-                    <i class="fas fa-save"></i> Guardar
-                </button>
-                <button onclick="cerrarModalConfigAPI()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium transition">
-                    <i class="fas fa-times"></i> Cancelar
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script>
         const SUPABASE_URL = 'https://sdqmuabsdsghptbttwiy.supabase.co/rest/v1';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkcW11YWJzZHNnaHB0YnR0d2l5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MTQ2NjMsImV4cCI6MjA4NTk5MDY2M30.Ki1AazQ5A7QcQuA0wUOjujGAGn1k749VRK2qoD7vNR0';
+
+        // URL de tu API de Dentalink
+        const DENTALINK_API_URL = 'https://api.dentalink.healthatom.com/api/v1/sucursales';
+        const DENTALINK_API_KEY = ''; // Configura tu API key aquí
 
         const headers = {
             'apikey': SUPABASE_KEY,
@@ -486,12 +466,6 @@
         let promocionesFiltradas = [];
         let paginaActual = 1;
         let itemsPorPagina = 10;
-
-        // Configuración API Dentalink (guardada en localStorage)
-        let configDentalink = {
-            url: localStorage.getItem('dentalink_api_url') || '',
-            key: localStorage.getItem('dentalink_api_key') || ''
-        };
 
         document.addEventListener('DOMContentLoaded', () => {
             cargarDatos();
@@ -592,10 +566,8 @@
 
         // SINCRONIZACIÓN CON DENTALINK
         async function sincronizarDentalink() {
-            if (!configDentalink.url || !configDentalink.key) {
-                if (confirm('No has configurado la API de Dentalink. ¿Deseas configurarla ahora?')) {
-                    document.getElementById('modalConfigAPI').classList.remove('hidden');
-                }
+            if (!DENTALINK_API_KEY) {
+                mostrarToast('Configura la API Key de Dentalink en el código', 'error');
                 return;
             }
 
@@ -603,10 +575,9 @@
             icon.classList.add('fa-spin');
 
             try {
-                // Llamar a la API de Dentalink
-                const response = await fetch(configDentalink.url, {
+                const response = await fetch(DENTALINK_API_URL, {
                     headers: {
-                        'Authorization': `Bearer ${configDentalink.key}`,
+                        'Authorization': `Bearer ${DENTALINK_API_KEY}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -615,32 +586,41 @@
                     throw new Error('Error en la API de Dentalink');
                 }
 
-                const sucursalesDentalink = await response.json();
+                const resultado = await response.json();
+
+                // La respuesta es un array con un objeto que contiene "data"
+                const sucursalesDentalink = resultado[0]?.data || [];
+
                 let nuevas = 0;
                 let actualizadas = 0;
+                let sinHorario = 0;
 
                 for (const sucDental of sucursalesDentalink) {
-                    // Verificar si ya existe por id_sucursal
                     const existe = sucursales.find(s => s.id_sucursal === sucDental.id);
 
+                    // Detectar si falta horario
+                    if (!sucDental.horarios && !existe) {
+                        sinHorario++;
+                    }
+
+                    const datos = {
+                        id_sucursal: sucDental.id,
+                        nombre_sucursal: sucDental.nombre,
+                        ciudad: sucDental.ciudad || sucDental.comuna || 'Sin ciudad',
+                        direccion: sucDental.direccion,
+                        telefono: sucDental.telefono,
+                        horarios: null, // NULL por defecto - se debe agregar manualmente
+                        activa: sucDental.habilitada === 1
+                    };
+
                     if (!existe) {
-                        // Crear nueva sucursal
                         await fetch(`${SUPABASE_URL}/sucursales`, {
                             method: 'POST',
                             headers,
-                            body: JSON.stringify({
-                                id_sucursal: sucDental.id,
-                                nombre_sucursal: sucDental.nombre || sucDental.name,
-                                ciudad: sucDental.ciudad || sucDental.city,
-                                direccion: sucDental.direccion || sucDental.address,
-                                telefono: sucDental.telefono || sucDental.phone,
-                                horarios: sucDental.horarios || sucDental.schedule,
-                                activa: true
-                            })
+                            body: JSON.stringify(datos)
                         });
                         nuevas++;
                     } else {
-                        // Actualizar datos existentes (opcional)
                         actualizadas++;
                     }
                 }
@@ -648,10 +628,12 @@
                 await cargarDatos();
                 icon.classList.remove('fa-spin');
 
-                if (nuevas > 0 || actualizadas > 0) {
-                    mostrarToast(`Sync completado: ${nuevas} nuevas, ${actualizadas} existentes`, 'success');
+                let mensaje = `Sync completado: ${nuevas} nuevas, ${actualizadas} existentes`;
+                if (sinHorario > 0) {
+                    mensaje += `. ⚠️ ${sinHorario} sucursal(es) sin horario`;
+                    mostrarToast(mensaje, 'warning');
                 } else {
-                    mostrarToast('Todo sincronizado. No hay cambios', 'info');
+                    mostrarToast(mensaje, 'success');
                 }
 
             } catch (error) {
@@ -659,27 +641,6 @@
                 icon.classList.remove('fa-spin');
                 mostrarToast('Error al sincronizar con Dentalink', 'error');
             }
-        }
-
-        function mostrarConfigAPI() {
-            document.getElementById('apiDentalinkURL').value = configDentalink.url;
-            document.getElementById('apiDentalinkKey').value = configDentalink.key;
-            document.getElementById('modalConfigAPI').classList.remove('hidden');
-        }
-
-        function cerrarModalConfigAPI() {
-            document.getElementById('modalConfigAPI').classList.add('hidden');
-        }
-
-        function guardarConfigAPI() {
-            configDentalink.url = document.getElementById('apiDentalinkURL').value;
-            configDentalink.key = document.getElementById('apiDentalinkKey').value;
-
-            localStorage.setItem('dentalink_api_url', configDentalink.url);
-            localStorage.setItem('dentalink_api_key', configDentalink.key);
-
-            cerrarModalConfigAPI();
-            mostrarToast('Configuración de API guardada', 'success');
         }
 
         function aplicarFiltrosActuales() {
@@ -846,13 +807,19 @@
             tbody.innerHTML = sucursales.map(suc => {
                 const cantPromos = relaciones.filter(r => r.id_sucursal === suc.id_sucursal).length;
                 const activa = suc.activa !== false;
+                const sinHorario = !suc.horarios;
+
                 return `
                 <tr class="hover:bg-gray-50 ${!activa ? 'opacity-60' : ''}">
                     <td class="px-6 py-4 text-sm font-bold text-blue-600">${suc.id_sucursal}</td>
                     <td class="px-6 py-4 text-sm font-medium text-gray-900">${suc.nombre_sucursal}</td>
                     <td class="px-6 py-4 text-sm text-gray-600">${suc.ciudad || '-'}</td>
                     <td class="px-6 py-4 text-sm text-gray-600">${suc.telefono || '-'}</td>
-                    <td class="px-6 py-4 text-xs text-gray-500">${(suc.horarios || '-').substring(0, 30)}...</td>
+                    <td class="px-6 py-4 text-xs ${sinHorario ? 'text-yellow-700' : 'text-gray-500'}">
+                        ${sinHorario 
+                            ? '<span class="sin-horario">⚠️ Sin horario</span>' 
+                            : (suc.horarios.substring(0, 30) + '...')}
+                    </td>
                     <td class="px-6 py-4">
                         <span class="px-2 py-1 text-xs rounded-full ${activa ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
                             ${activa ? '✓ Activa' : '✗ Inactiva'}
@@ -1100,7 +1067,7 @@
                 ciudad: document.getElementById('ciudadSucursal').value,
                 direccion: document.getElementById('direccionSucursal').value,
                 telefono: document.getElementById('telefonoSucursal').value,
-                horarios: document.getElementById('horariosSucursal').value,
+                horarios: document.getElementById('horariosSucursal').value || null,
                 activa: document.getElementById('activaSucursal').value === 'true'
             };
 
@@ -1113,7 +1080,6 @@
                     });
                     mostrarToast('Sucursal actualizada correctamente', 'success');
                 } else {
-                    // Verificar si ya existe
                     const existe = sucursales.find(s => s.id_sucursal === idSucursal);
                     if (existe) {
                         mostrarToast('Ya existe una sucursal con ese ID', 'error');
