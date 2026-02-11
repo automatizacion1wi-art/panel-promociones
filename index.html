@@ -6,6 +6,10 @@
     <title>Dashboard - Promociones DX-RAY</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; }
+        .section-hidden { display: none; }
+    </style>
 </head>
 <body class="bg-gray-50">
     <div class="min-h-screen">
@@ -17,158 +21,204 @@
             </div>
         </header>
 
-        <div class="container mx-auto px-6 py-8">
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-500 text-sm font-medium">Total Promociones</p>
-                            <p class="text-3xl font-bold text-gray-800" id="totalPromos">0</p>
-                        </div>
-                        <div class="bg-blue-100 rounded-full p-3">
-                            <i class="fas fa-tags text-blue-600 text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-500 text-sm font-medium">Promociones Activas</p>
-                            <p class="text-3xl font-bold text-gray-800" id="promosActivas">0</p>
-                        </div>
-                        <div class="bg-green-100 rounded-full p-3">
-                            <i class="fas fa-check-circle text-green-600 text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-500 text-sm font-medium">Promociones Inactivas</p>
-                            <p class="text-3xl font-bold text-gray-800" id="promosInactivas">0</p>
-                        </div>
-                        <div class="bg-red-100 rounded-full p-3">
-                            <i class="fas fa-times-circle text-red-600 text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-500 text-sm font-medium">Sucursales</p>
-                            <p class="text-3xl font-bold text-gray-800" id="totalSucursales">0</p>
-                        </div>
-                        <div class="bg-purple-100 rounded-full p-3">
-                            <i class="fas fa-building text-purple-600 text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Promociones por Sucursal -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">📊 Promociones por Sucursal</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursal</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ciudad</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Promos</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Activas</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaSucursalesPromos" class="bg-white divide-y divide-gray-200">
-                            <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">Cargando...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Gestión de Promociones -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">📋 Gestión de Promociones</h3>
-                    <button onclick="mostrarFormNuevaPromocion()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
-                        <i class="fas fa-plus"></i>
-                        Nueva Promoción
+        <!-- Navegación por pestañas -->
+        <div class="bg-white shadow-md border-b">
+            <div class="container mx-auto px-6">
+                <nav class="flex gap-8">
+                    <button onclick="cambiarSeccion('dashboard')" id="tab-dashboard" class="tab-active py-4 px-2 font-medium transition">
+                        <i class="fas fa-chart-line mr-2"></i>Dashboard
                     </button>
+                    <button onclick="cambiarSeccion('promociones')" id="tab-promociones" class="py-4 px-2 font-medium text-gray-600 hover:text-blue-600 transition">
+                        <i class="fas fa-tags mr-2"></i>Promociones
+                    </button>
+                    <button onclick="cambiarSeccion('sucursales')" id="tab-sucursales" class="py-4 px-2 font-medium text-gray-600 hover:text-blue-600 transition">
+                        <i class="fas fa-building mr-2"></i>Sucursales
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <div class="container mx-auto px-6 py-8">
+
+            <!-- SECCIÓN: DASHBOARD -->
+            <div id="section-dashboard">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-medium">Total Promociones</p>
+                                <p class="text-3xl font-bold text-gray-800" id="totalPromos">0</p>
+                            </div>
+                            <div class="bg-blue-100 rounded-full p-3">
+                                <i class="fas fa-tags text-blue-600 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-medium">Promociones Activas</p>
+                                <p class="text-3xl font-bold text-gray-800" id="promosActivas">0</p>
+                            </div>
+                            <div class="bg-green-100 rounded-full p-3">
+                                <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-medium">Promociones Inactivas</p>
+                                <p class="text-3xl font-bold text-gray-800" id="promosInactivas">0</p>
+                            </div>
+                            <div class="bg-red-100 rounded-full p-3">
+                                <i class="fas fa-times-circle text-red-600 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-medium">Sucursales</p>
+                                <p class="text-3xl font-bold text-gray-800" id="totalSucursales">0</p>
+                            </div>
+                            <div class="bg-purple-100 rounded-full p-3">
+                                <i class="fas fa-building text-purple-600 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Filtros -->
-                <div class="mb-4 flex gap-4 flex-wrap">
-                    <select id="filtroSucursal" onchange="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2">
-                        <option value="">Todas las sucursales</option>
-                    </select>
-                    <select id="filtroEstado" onchange="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2">
-                        <option value="">Todos los estados</option>
-                        <option value="true">Activas</option>
-                        <option value="false">Inactivas</option>
-                    </select>
-                    <input type="text" id="buscarPromo" placeholder="Buscar promoción..." onkeyup="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2 flex-1 min-w-[200px]">
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Precio</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursales</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaPromociones" class="bg-white divide-y divide-gray-200">
-                            <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">Cargando...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- Promociones por Sucursal -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">📊 Promociones por Sucursal</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursal</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ciudad</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Promos</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Activas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaSucursalesPromos" class="bg-white divide-y divide-gray-200">
+                                <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <!-- Gestión de Sucursales -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">🏥 Sucursales Registradas</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ciudad</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teléfono</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Horarios</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaSucursales" class="bg-white divide-y divide-gray-200">
-                            <tr>
-                                <td colspan="4" class="px-6 py-4 text-center text-gray-500">Cargando...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <!-- SECCIÓN: PROMOCIONES -->
+            <div id="section-promociones" class="section-hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">📋 Gestión de Promociones</h3>
+                        <button onclick="mostrarFormNuevaPromocion()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                            <i class="fas fa-plus"></i>
+                            Nueva Promoción
+                        </button>
+                    </div>
+
+                    <!-- Filtros -->
+                    <div class="mb-4 flex gap-4 flex-wrap">
+                        <select id="filtroSucursal" onchange="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2">
+                            <option value="">Todas las sucursales</option>
+                        </select>
+                        <select id="filtroEstado" onchange="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2">
+                            <option value="">Todos los estados</option>
+                            <option value="true">Activas</option>
+                            <option value="false">Inactivas</option>
+                        </select>
+                        <input type="text" id="buscarPromo" placeholder="Buscar promoción..." onkeyup="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2 flex-1 min-w-[200px]">
+                    </div>
+
+                    <!-- Selector de items por página -->
+                    <div class="mb-4 flex items-center gap-2">
+                        <label class="text-sm text-gray-600">Mostrar:</label>
+                        <select id="itemsPorPagina" onchange="cambiarItemsPorPagina()" class="border border-gray-300 rounded px-3 py-1 text-sm">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <span class="text-sm text-gray-600">registros</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Precio</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursales</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaPromociones" class="bg-white divide-y divide-gray-200">
+                                <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    <div class="mt-4 flex justify-between items-center">
+                        <div class="text-sm text-gray-600" id="infoPromos"></div>
+                        <div class="flex gap-2" id="paginacionPromos"></div>
+                    </div>
                 </div>
             </div>
+
+            <!-- SECCIÓN: SUCURSALES -->
+            <div id="section-sucursales" class="section-hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">🏥 Gestión de Sucursales</h3>
+                        <button onclick="mostrarFormNuevaSucursal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                            <i class="fas fa-plus"></i>
+                            Nueva Sucursal
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ciudad</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teléfono</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Promociones</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaSucursales" class="bg-white divide-y divide-gray-200">
+                                <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- Modal Nueva Promoción -->
-    <div id="modalNuevaPromo" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <!-- Modal Nueva/Editar Promoción -->
+    <div id="modalPromocion" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
         <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-gray-800">➕ Nueva Promoción</h3>
-                <button onclick="cerrarModal()" class="text-gray-500 hover:text-gray-700">
+                <h3 class="text-2xl font-bold text-gray-800" id="tituloModalPromo">➕ Nueva Promoción</h3>
+                <button onclick="cerrarModalPromocion()" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times text-2xl"></i>
                 </button>
             </div>
-            <form id="formNuevaPromo" onsubmit="guardarPromocion(event)">
+            <form id="formPromocion" onsubmit="guardarPromocion(event)">
+                <input type="hidden" id="idPromocionEditar">
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
@@ -196,15 +246,14 @@
                             </button>
                         </div>
                         <div id="checkboxesSucursales" class="space-y-2 max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
-                            <!-- Se llenan dinámicamente -->
                         </div>
                     </div>
                 </div>
                 <div class="flex gap-4 mt-6">
                     <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition">
-                        <i class="fas fa-save"></i> Guardar Promoción
+                        <i class="fas fa-save"></i> Guardar
                     </button>
-                    <button type="button" onclick="cerrarModal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium transition">
+                    <button type="button" onclick="cerrarModalPromocion()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium transition">
                         <i class="fas fa-times"></i> Cancelar
                     </button>
                 </div>
@@ -212,47 +261,48 @@
         </div>
     </div>
 
-    <!-- Modal Editar Sucursales de Promoción -->
-    <div id="modalEditarSucursales" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <!-- Modal Nueva/Editar Sucursal -->
+    <div id="modalSucursal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4">
             <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h3 class="text-2xl font-bold text-gray-800">🏥 Gestionar Sucursales</h3>
-                    <p class="text-sm text-gray-500 mt-1" id="nombrePromoEditar"></p>
-                </div>
-                <button onclick="cerrarModalEditarSucursales()" class="text-gray-500 hover:text-gray-700">
+                <h3 class="text-2xl font-bold text-gray-800" id="tituloModalSucursal">➕ Nueva Sucursal</h3>
+                <button onclick="cerrarModalSucursal()" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times text-2xl"></i>
                 </button>
             </div>
-
-            <div class="mb-4 p-4 bg-blue-50 rounded-lg">
-                <p class="text-sm text-blue-800">
-                    <i class="fas fa-info-circle"></i> 
-                    Selecciona las sucursales donde quieres que aparezca esta promoción
-                </p>
-            </div>
-
-            <div class="flex gap-2 mb-4">
-                <button type="button" onclick="seleccionarTodasEditar()" class="text-sm text-blue-600 hover:text-blue-800">
-                    <i class="fas fa-check-square"></i> Seleccionar todas
-                </button>
-                <button type="button" onclick="deseleccionarTodasEditar()" class="text-sm text-gray-600 hover:text-gray-800">
-                    <i class="fas fa-square"></i> Deseleccionar todas
-                </button>
-            </div>
-
-            <div id="checkboxesSucursalesEditar" class="space-y-2 max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
-                <!-- Se llenan dinámicamente -->
-            </div>
-
-            <div class="flex gap-4 mt-6">
-                <button onclick="guardarSucursalesPromocion()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition">
-                    <i class="fas fa-save"></i> Guardar Cambios
-                </button>
-                <button onclick="cerrarModalEditarSucursales()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium transition">
-                    <i class="fas fa-times"></i> Cancelar
-                </button>
-            </div>
+            <form id="formSucursal" onsubmit="guardarSucursal(event)">
+                <input type="hidden" id="idSucursalEditar">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nombre de la Sucursal</label>
+                        <input type="text" id="nombreSucursal" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Ciudad</label>
+                        <input type="text" id="ciudadSucursal" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Dirección</label>
+                        <textarea id="direccionSucursal" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" rows="2"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                        <input type="text" id="telefonoSucursal" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Horarios</label>
+                        <input type="text" id="horariosSucursal" placeholder="Ej: Lunes a Viernes 10:00 - 19:00" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-6">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <button type="button" onclick="cerrarModalSucursal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium transition">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -263,7 +313,7 @@
 
         const headers = {
             'apikey': SUPABASE_KEY,
-            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
             'Content-Type': 'application/json',
             'Prefer': 'return=representation'
         };
@@ -272,7 +322,8 @@
         let sucursales = [];
         let relaciones = [];
         let promocionesFiltradas = [];
-        let promocionEditando = null;
+        let paginaActual = 1;
+        let itemsPorPagina = 10;
 
         document.addEventListener('DOMContentLoaded', () => {
             cargarDatos();
@@ -324,42 +375,63 @@
             document.getElementById('totalSucursales').textContent = sucursales.length;
         }
 
+        function cambiarSeccion(seccion) {
+            // Ocultar todas las secciones
+            document.getElementById('section-dashboard').classList.add('section-hidden');
+            document.getElementById('section-promociones').classList.add('section-hidden');
+            document.getElementById('section-sucursales').classList.add('section-hidden');
+
+            // Remover clase activa de todos los tabs
+            document.getElementById('tab-dashboard').classList.remove('tab-active');
+            document.getElementById('tab-promociones').classList.remove('tab-active');
+            document.getElementById('tab-sucursales').classList.remove('tab-active');
+
+            // Mostrar sección seleccionada
+            document.getElementById(`section-${seccion}`).classList.remove('section-hidden');
+            document.getElementById(`tab-${seccion}`).classList.add('tab-active');
+        }
+
+        function cambiarItemsPorPagina() {
+            itemsPorPagina = parseInt(document.getElementById('itemsPorPagina').value);
+            paginaActual = 1;
+            renderizarTablaPromociones();
+        }
+
         function renderizarTablaPromociones() {
             const tbody = document.getElementById('tablaPromociones');
             if (promocionesFiltradas.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No hay promociones</td></tr>';
+                document.getElementById('infoPromos').textContent = '';
+                document.getElementById('paginacionPromos').innerHTML = '';
                 return;
             }
 
-            tbody.innerHTML = promocionesFiltradas.map(promo => {
+            // Calcular paginación
+            const totalPaginas = Math.ceil(promocionesFiltradas.length / itemsPorPagina);
+            const inicio = (paginaActual - 1) * itemsPorPagina;
+            const fin = inicio + itemsPorPagina;
+            const promosPagina = promocionesFiltradas.slice(inicio, fin);
+
+            tbody.innerHTML = promosPagina.map(promo => {
                 const sucursalesAsignadas = relaciones.filter(r => r.id_promocion === promo.id_promocion);
-                const nombresSucursales = sucursalesAsignadas.map(r => {
-                    const suc = sucursales.find(s => s.id_sucursal === r.id_sucursal);
-                    return suc ? suc.nombre_sucursal : '';
-                }).filter(n => n);
 
                 return `
                     <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 text-sm text-gray-900">${promo.descripcion.substring(0, 80)}${promo.descripcion.length > 80 ? '...' : ''}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">${promo.descripcion.substring(0, 60)}${promo.descripcion.length > 60 ? '...' : ''}</td>
                         <td class="px-6 py-4 text-sm font-semibold text-green-600">$${Number(promo.precio).toFixed(2)}</td>
                         <td class="px-6 py-4">
                             <span class="px-2 py-1 text-xs rounded-full ${promo.activa ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
                                 ${promo.activa ? '✓ Activa' : '✗ Inactiva'}
                             </span>
                         </td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm font-semibold text-blue-600">${sucursalesAsignadas.length}</span>
-                                <button onclick="editarSucursalesPromocion(${promo.id_promocion})" 
-                                        class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 rounded transition"
-                                        title="Gestionar sucursales">
-                                    <i class="fas fa-edit"></i> Editar
-                                </button>
-                            </div>
-                        </td>
+                        <td class="px-6 py-4 text-sm font-semibold text-blue-600">${sucursalesAsignadas.length}</td>
                         <td class="px-6 py-4 flex gap-2">
+                            <button onclick="editarPromocion(${promo.id_promocion})" 
+                                    class="text-blue-600 hover:text-blue-800 text-lg" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
                             <button onclick="toggleEstadoPromo(${promo.id_promocion}, ${promo.activa})" 
-                                    class="text-blue-600 hover:text-blue-800 text-lg" title="Cambiar estado">
+                                    class="text-orange-600 hover:text-orange-800 text-lg" title="Cambiar estado">
                                 <i class="fas fa-toggle-${promo.activa ? 'on' : 'off'}"></i>
                             </button>
                             <button onclick="eliminarPromo(${promo.id_promocion})" 
@@ -370,18 +442,58 @@
                     </tr>
                 `;
             }).join('');
+
+            // Info de paginación
+            document.getElementById('infoPromos').textContent = `Mostrando ${inicio + 1} - ${Math.min(fin, promocionesFiltradas.length)} de ${promocionesFiltradas.length} promociones`;
+
+            // Botones de paginación
+            let paginacionHTML = '';
+            if (paginaActual > 1) {
+                paginacionHTML += `<button onclick="cambiarPagina(${paginaActual - 1})" class="px-3 py-1 border rounded hover:bg-gray-100">Anterior</button>`;
+            }
+            for (let i = 1; i <= totalPaginas; i++) {
+                if (i === paginaActual) {
+                    paginacionHTML += `<button class="px-3 py-1 border rounded bg-blue-600 text-white">${i}</button>`;
+                } else if (Math.abs(i - paginaActual) <= 2 || i === 1 || i === totalPaginas) {
+                    paginacionHTML += `<button onclick="cambiarPagina(${i})" class="px-3 py-1 border rounded hover:bg-gray-100">${i}</button>`;
+                } else if (Math.abs(i - paginaActual) === 3) {
+                    paginacionHTML += `<span class="px-2">...</span>`;
+                }
+            }
+            if (paginaActual < totalPaginas) {
+                paginacionHTML += `<button onclick="cambiarPagina(${paginaActual + 1})" class="px-3 py-1 border rounded hover:bg-gray-100">Siguiente</button>`;
+            }
+            document.getElementById('paginacionPromos').innerHTML = paginacionHTML;
+        }
+
+        function cambiarPagina(pagina) {
+            paginaActual = pagina;
+            renderizarTablaPromociones();
         }
 
         function renderizarTablaSucursales() {
             const tbody = document.getElementById('tablaSucursales');
-            tbody.innerHTML = sucursales.map(suc => `
+            tbody.innerHTML = sucursales.map(suc => {
+                const cantPromos = relaciones.filter(r => r.id_sucursal === suc.id_sucursal).length;
+                return `
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4 text-sm font-medium text-gray-900">${suc.nombre_sucursal}</td>
                     <td class="px-6 py-4 text-sm text-gray-600">${suc.ciudad || '-'}</td>
                     <td class="px-6 py-4 text-sm text-gray-600">${suc.telefono || '-'}</td>
-                    <td class="px-6 py-4 text-sm text-gray-600">${suc.horarios || '-'}</td>
+                    <td class="px-6 py-4 text-sm font-semibold text-blue-600">${cantPromos}</td>
+                    <td class="px-6 py-4 flex gap-2">
+                        <button onclick="editarSucursal(${suc.id_sucursal})" 
+                                class="text-blue-600 hover:text-blue-800 text-lg" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="eliminarSucursal(${suc.id_sucursal})" 
+                                class="text-red-600 hover:text-red-800 text-lg" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function renderizarPromosPorSucursal() {
@@ -399,12 +511,6 @@
                         <td class="px-6 py-4 text-sm text-gray-600">${suc.ciudad || '-'}</td>
                         <td class="px-6 py-4 text-sm font-semibold text-blue-600">${promosEnSucursal.length}</td>
                         <td class="px-6 py-4 text-sm font-semibold text-green-600">${promosActivas}</td>
-                        <td class="px-6 py-4">
-                            <button onclick="verPromosSucursal(${suc.id_sucursal})" 
-                                    class="text-blue-600 hover:text-blue-800">
-                                <i class="fas fa-eye"></i> Ver
-                            </button>
-                        </td>
                     </tr>
                 `;
             }).join('');
@@ -416,18 +522,21 @@
                 sucursales.map(s => `<option value="${s.id_sucursal}">${s.nombre_sucursal}</option>`).join('');
         }
 
-        function llenarCheckboxesSucursales() {
+        function llenarCheckboxesSucursales(sucursalesSeleccionadas = []) {
             const container = document.getElementById('checkboxesSucursales');
-            container.innerHTML = sucursales.map(s => `
+            container.innerHTML = sucursales.map(s => {
+                const checked = sucursalesSeleccionadas.includes(s.id_sucursal) ? 'checked' : '';
+                return `
                 <label class="flex items-center space-x-3 cursor-pointer hover:bg-white p-3 rounded-lg transition group">
-                    <input type="checkbox" name="sucursales" value="${s.id_sucursal}" 
+                    <input type="checkbox" name="sucursales" value="${s.id_sucursal}" ${checked}
                            class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
                     <div class="flex-1">
                         <span class="text-sm font-medium text-gray-900 group-hover:text-blue-600">${s.nombre_sucursal}</span>
                         <span class="text-xs text-gray-500 ml-2">${s.ciudad}</span>
                     </div>
                 </label>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function seleccionarTodasSucursales() {
@@ -438,95 +547,39 @@
             document.querySelectorAll('#checkboxesSucursales input[type="checkbox"]').forEach(cb => cb.checked = false);
         }
 
-        function seleccionarTodasEditar() {
-            document.querySelectorAll('#checkboxesSucursalesEditar input[type="checkbox"]').forEach(cb => cb.checked = true);
-        }
-
-        function deseleccionarTodasEditar() {
-            document.querySelectorAll('#checkboxesSucursalesEditar input[type="checkbox"]').forEach(cb => cb.checked = false);
-        }
-
         function mostrarFormNuevaPromocion() {
-            document.getElementById('modalNuevaPromo').classList.remove('hidden');
+            document.getElementById('tituloModalPromo').textContent = '➕ Nueva Promoción';
+            document.getElementById('idPromocionEditar').value = '';
+            document.getElementById('formPromocion').reset();
+            llenarCheckboxesSucursales();
+            document.getElementById('modalPromocion').classList.remove('hidden');
         }
 
-        function cerrarModal() {
-            document.getElementById('modalNuevaPromo').classList.add('hidden');
-            document.getElementById('formNuevaPromo').reset();
+        function cerrarModalPromocion() {
+            document.getElementById('modalPromocion').classList.add('hidden');
+            document.getElementById('formPromocion').reset();
         }
 
-        function editarSucursalesPromocion(idPromocion) {
-            promocionEditando = promociones.find(p => p.id_promocion === idPromocion);
-            if (!promocionEditando) return;
+        function editarPromocion(idPromocion) {
+            const promo = promociones.find(p => p.id_promocion === idPromocion);
+            if (!promo) return;
 
-            document.getElementById('nombrePromoEditar').textContent = promocionEditando.descripcion.substring(0, 60) + '...';
+            document.getElementById('tituloModalPromo').textContent = '✏️ Editar Promoción';
+            document.getElementById('idPromocionEditar').value = promo.id_promocion;
+            document.getElementById('descripcion').value = promo.descripcion;
+            document.getElementById('precio').value = promo.precio;
+            document.getElementById('activa').value = promo.activa.toString();
 
-            // Llenar checkboxes con sucursales actuales marcadas
-            const relacionesActuales = relaciones.filter(r => r.id_promocion === idPromocion).map(r => r.id_sucursal);
-            const container = document.getElementById('checkboxesSucursalesEditar');
-            container.innerHTML = sucursales.map(s => {
-                const checked = relacionesActuales.includes(s.id_sucursal) ? 'checked' : '';
-                return `
-                    <label class="flex items-center space-x-3 cursor-pointer hover:bg-white p-3 rounded-lg transition group">
-                        <input type="checkbox" name="sucursalesEditar" value="${s.id_sucursal}" ${checked}
-                               class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
-                        <div class="flex-1">
-                            <span class="text-sm font-medium text-gray-900 group-hover:text-blue-600">${s.nombre_sucursal}</span>
-                            <span class="text-xs text-gray-500 ml-2">${s.ciudad}</span>
-                        </div>
-                    </label>
-                `;
-            }).join('');
+            const sucursalesAsignadas = relaciones.filter(r => r.id_promocion === idPromocion).map(r => r.id_sucursal);
+            llenarCheckboxesSucursales(sucursalesAsignadas);
 
-            document.getElementById('modalEditarSucursales').classList.remove('hidden');
-        }
-
-        function cerrarModalEditarSucursales() {
-            document.getElementById('modalEditarSucursales').classList.add('hidden');
-            promocionEditando = null;
-        }
-
-        async function guardarSucursalesPromocion() {
-            if (!promocionEditando) return;
-
-            const sucursalesSeleccionadas = Array.from(document.querySelectorAll('input[name="sucursalesEditar"]:checked')).map(cb => parseInt(cb.value));
-
-            if (sucursalesSeleccionadas.length === 0) {
-                alert('⚠️ Debes seleccionar al menos una sucursal');
-                return;
-            }
-
-            try {
-                // 1. Eliminar todas las relaciones actuales de esta promoción
-                await fetch(`${SUPABASE_URL}/sucursal_promocion?id_promocion=eq.${promocionEditando.id_promocion}`, {
-                    method: 'DELETE',
-                    headers
-                });
-
-                // 2. Crear las nuevas relaciones
-                const relacionesNuevas = sucursalesSeleccionadas.map(id_suc => ({
-                    id_sucursal: id_suc,
-                    id_promocion: promocionEditando.id_promocion
-                }));
-
-                await fetch(`${SUPABASE_URL}/sucursal_promocion`, {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify(relacionesNuevas)
-                });
-
-                alert('✅ Sucursales actualizadas exitosamente');
-                cerrarModalEditarSucursales();
-                await cargarDatos();
-            } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Error al actualizar sucursales');
-            }
+            document.getElementById('modalPromocion').classList.remove('hidden');
         }
 
         async function guardarPromocion(event) {
             event.preventDefault();
 
+            const idEditar = document.getElementById('idPromocionEditar').value;
             const descripcion = document.getElementById('descripcion').value;
             const precio = parseFloat(document.getElementById('precio').value);
             const activa = document.getElementById('activa').value === 'true';
@@ -538,18 +591,37 @@
             }
 
             try {
-                // 1. Crear la promoción
-                const responsePromo = await fetch(`${SUPABASE_URL}/promociones`, {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify({ descripcion, precio, activa })
-                });
-                const [nuevaPromo] = await responsePromo.json();
+                let idPromocion;
 
-                // 2. Crear las relaciones
+                if (idEditar) {
+                    // EDITAR promoción existente
+                    await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${idEditar}`, {
+                        method: 'PATCH',
+                        headers,
+                        body: JSON.stringify({ descripcion, precio, activa })
+                    });
+                    idPromocion = parseInt(idEditar);
+
+                    // Eliminar relaciones anteriores
+                    await fetch(`${SUPABASE_URL}/sucursal_promocion?id_promocion=eq.${idPromocion}`, {
+                        method: 'DELETE',
+                        headers
+                    });
+                } else {
+                    // CREAR nueva promoción
+                    const responsePromo = await fetch(`${SUPABASE_URL}/promociones`, {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify({ descripcion, precio, activa })
+                    });
+                    const [nuevaPromo] = await responsePromo.json();
+                    idPromocion = nuevaPromo.id_promocion;
+                }
+
+                // Crear las relaciones
                 const relacionesNuevas = sucursalesSeleccionadas.map(id_suc => ({
                     id_sucursal: id_suc,
-                    id_promocion: nuevaPromo.id_promocion
+                    id_promocion: idPromocion
                 }));
 
                 await fetch(`${SUPABASE_URL}/sucursal_promocion`, {
@@ -558,8 +630,8 @@
                     body: JSON.stringify(relacionesNuevas)
                 });
 
-                alert('✅ Promoción creada exitosamente');
-                cerrarModal();
+                alert(idEditar ? '✅ Promoción actualizada' : '✅ Promoción creada');
+                cerrarModalPromocion();
                 await cargarDatos();
             } catch (error) {
                 console.error('Error:', error);
@@ -582,7 +654,7 @@
         }
 
         async function eliminarPromo(id) {
-            if (!confirm('⚠️ ¿Eliminar esta promoción? Se eliminarán también sus asignaciones a sucursales.')) return;
+            if (!confirm('⚠️ ¿Eliminar esta promoción?')) return;
 
             try {
                 await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${id}`, {
@@ -590,6 +662,87 @@
                     headers
                 });
                 alert('✅ Promoción eliminada');
+                await cargarDatos();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al eliminar');
+            }
+        }
+
+        // CRUD SUCURSALES
+        function mostrarFormNuevaSucursal() {
+            document.getElementById('tituloModalSucursal').textContent = '➕ Nueva Sucursal';
+            document.getElementById('idSucursalEditar').value = '';
+            document.getElementById('formSucursal').reset();
+            document.getElementById('modalSucursal').classList.remove('hidden');
+        }
+
+        function cerrarModalSucursal() {
+            document.getElementById('modalSucursal').classList.add('hidden');
+            document.getElementById('formSucursal').reset();
+        }
+
+        function editarSucursal(idSucursal) {
+            const suc = sucursales.find(s => s.id_sucursal === idSucursal);
+            if (!suc) return;
+
+            document.getElementById('tituloModalSucursal').textContent = '✏️ Editar Sucursal';
+            document.getElementById('idSucursalEditar').value = suc.id_sucursal;
+            document.getElementById('nombreSucursal').value = suc.nombre_sucursal;
+            document.getElementById('ciudadSucursal').value = suc.ciudad || '';
+            document.getElementById('direccionSucursal').value = suc.direccion || '';
+            document.getElementById('telefonoSucursal').value = suc.telefono || '';
+            document.getElementById('horariosSucursal').value = suc.horarios || '';
+
+            document.getElementById('modalSucursal').classList.remove('hidden');
+        }
+
+        async function guardarSucursal(event) {
+            event.preventDefault();
+
+            const idEditar = document.getElementById('idSucursalEditar').value;
+            const datos = {
+                nombre_sucursal: document.getElementById('nombreSucursal').value,
+                ciudad: document.getElementById('ciudadSucursal').value,
+                direccion: document.getElementById('direccionSucursal').value,
+                telefono: document.getElementById('telefonoSucursal').value,
+                horarios: document.getElementById('horariosSucursal').value
+            };
+
+            try {
+                if (idEditar) {
+                    await fetch(`${SUPABASE_URL}/sucursales?id_sucursal=eq.${idEditar}`, {
+                        method: 'PATCH',
+                        headers,
+                        body: JSON.stringify(datos)
+                    });
+                    alert('✅ Sucursal actualizada');
+                } else {
+                    await fetch(`${SUPABASE_URL}/sucursales`, {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify(datos)
+                    });
+                    alert('✅ Sucursal creada');
+                }
+
+                cerrarModalSucursal();
+                await cargarDatos();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al guardar sucursal');
+            }
+        }
+
+        async function eliminarSucursal(id) {
+            if (!confirm('⚠️ ¿Eliminar esta sucursal? Se eliminarán sus relaciones con promociones.')) return;
+
+            try {
+                await fetch(`${SUPABASE_URL}/sucursales?id_sucursal=eq.${id}`, {
+                    method: 'DELETE',
+                    headers
+                });
+                alert('✅ Sucursal eliminada');
                 await cargarDatos();
             } catch (error) {
                 console.error('Error:', error);
@@ -622,24 +775,8 @@
                 return true;
             });
 
+            paginaActual = 1;
             renderizarTablaPromociones();
-        }
-
-        function verPromosSucursal(idSucursal) {
-            const suc = sucursales.find(s => s.id_sucursal === idSucursal);
-            const promosIds = relaciones.filter(r => r.id_sucursal === idSucursal).map(r => r.id_promocion);
-            const promosSucursal = promociones.filter(p => promosIds.includes(p.id_promocion));
-
-            if (promosSucursal.length === 0) {
-                alert(`${suc.nombre_sucursal} no tiene promociones asignadas`);
-                return;
-            }
-
-            const lista = promosSucursal.map((p, i) => 
-                `${i+1}. ${p.descripcion.substring(0, 60)}... - $${p.precio} ${p.activa ? '✅' : '❌'}`
-            ).join('\n\n');
-
-            alert(`📋 Promociones en ${suc.nombre_sucursal}:\n\n${lista}`);
         }
     </script>
 </body>
