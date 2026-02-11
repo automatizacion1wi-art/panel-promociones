@@ -451,7 +451,7 @@
 
         // 🔧 CONFIGURA AQUÍ TU TOKEN DE DENTALINK
         const DENTALINK_API_URL = 'https://api.dentalink.healthatom.com/api/v1/sucursales';
-        const DENTALINK_TOKEN = 'uLDY8zgT9Oa10nDXSr8PPCou8MFT4BPNjwlYMcEX.c24YdKRkDONJW7nXcdQhx6VLEvsbxVFWia4FXmXh'; // ⚠️ Coloca aquí tu token de Dentalink
+        const DENTALINK_TOKEN = ''; // ⚠️ Coloca aquí tu token de Dentalink
 
         const headers = {
             'apikey': SUPABASE_KEY,
@@ -564,7 +564,7 @@
             }
         }
 
-        // 🔄 SINCRONIZACIÓN CON DENTALINK (HEADER CORREGIDO)
+        // 🔄 SINCRONIZACIÓN CON DENTALINK - HORARIOS NO SE ACTUALIZAN
         async function sincronizarDentalink() {
             if (!DENTALINK_TOKEN) {
                 mostrarToast('⚠️ Configura el token de Dentalink en el código', 'error');
@@ -575,7 +575,6 @@
             icon.classList.add('fa-spin');
 
             try {
-                // FORMATO CORRECTO: Authorization: Token <token>
                 const response = await fetch(DENTALINK_API_URL, {
                     method: 'GET',
                     headers: {
@@ -589,8 +588,6 @@
                 }
 
                 const resultado = await response.json();
-
-                // La respuesta tiene "data" directamente según la documentación
                 const sucursalesDentalink = resultado.data || [];
 
                 let nuevas = 0;
@@ -600,34 +597,40 @@
                 for (const sucDental of sucursalesDentalink) {
                     const existe = sucursales.find(s => s.id_sucursal === sucDental.id);
 
-                    // Detectar si falta horario
-                    if (!sucDental.horarios && !existe) {
-                        sinHorario++;
-                    }
-
-                    const datos = {
-                        id_sucursal: sucDental.id,
-                        nombre_sucursal: sucDental.nombre,
-                        ciudad: sucDental.ciudad || sucDental.comuna || 'Sin ciudad',
-                        direccion: sucDental.direccion,
-                        telefono: sucDental.telefono,
-                        horarios: null, // NULL por defecto - se debe agregar manualmente
-                        activa: sucDental.habilitada === 1
-                    };
-
                     if (!existe) {
+                        // ✅ NUEVA SUCURSAL - se crea con horarios = NULL
+                        const datos = {
+                            id_sucursal: sucDental.id,
+                            nombre_sucursal: sucDental.nombre,
+                            ciudad: sucDental.ciudad || sucDental.comuna || 'Sin ciudad',
+                            direccion: sucDental.direccion,
+                            telefono: sucDental.telefono,
+                            horarios: null, // NULL - se debe agregar manualmente desde el dashboard
+                            activa: sucDental.habilitada === 1
+                        };
+
                         await fetch(`${SUPABASE_URL}/sucursales`, {
                             method: 'POST',
                             headers,
                             body: JSON.stringify(datos)
                         });
                         nuevas++;
+                        sinHorario++;
                     } else {
-                        // Actualizar datos existentes
+                        // 🔄 ACTUALIZACIÓN - horarios NO se toca, solo otros campos
+                        const datosActualizar = {
+                            nombre_sucursal: sucDental.nombre,
+                            ciudad: sucDental.ciudad || sucDental.comuna || 'Sin ciudad',
+                            direccion: sucDental.direccion,
+                            telefono: sucDental.telefono,
+                            activa: sucDental.habilitada === 1
+                            // ⚠️ horarios NO se incluye en la actualización
+                        };
+
                         await fetch(`${SUPABASE_URL}/sucursales?id_sucursal=eq.${sucDental.id}`, {
                             method: 'PATCH',
                             headers,
-                            body: JSON.stringify(datos)
+                            body: JSON.stringify(datosActualizar)
                         });
                         actualizadas++;
                     }
