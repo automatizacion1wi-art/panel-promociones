@@ -3,883 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Admin - Promociones Dental+</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Jost:wght@600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --text-100: #26282c;
-            --text-80: #4e5565;
-            --text-60: #6d7488;
-            --text-40: #929bb2;
-            --blue-100: #0879ca;
-            --blue-150: #0761b4;
-            --blue-80: #9ebdd9;
-            --blue-60: #dce4eb;
-            --blue-40: #e8ecef;
-            --blue-200: #00408c;
-            --blue-300: #01162f;
-            --dentalink-blue-500: #17a6e0;
-            --dentalink-blue-100: #e1f3fd;
-            --white-00: white;
-            --grey-20: #fafafa;
-            --secondary-50: #7f52fe;
-            --secondary-100: #521ee6;
-            --secondary-200: #3c16aa;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--grey-20);
-            color: var(--text-100);
-            min-height: 100vh;
-            font-size: 14px;
-            line-height: 150%;
-        }
-
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 260px;
-            height: 100vh;
-            background: linear-gradient(180deg, var(--blue-200) 0%, var(--blue-100) 100%);
-            padding: 30px 20px;
-            box-shadow: 4px 0 12px rgba(0,0,0,0.08);
-            z-index: 1000;
-        }
-
-        .logo {
-            color: var(--white-00);
-            font-family: 'Jost', sans-serif;
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 40px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .menu {
-            list-style: none;
-        }
-
-        .menu-item {
-            margin-bottom: 8px;
-        }
-
-        .menu-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 16px;
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            border-radius: 6px;
-            transition: all 0.2s;
-            font-size: 15px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .menu-link:hover, .menu-link.active {
-            background: rgba(255,255,255,0.15);
-            color: var(--white-00);
-        }
-
-        .menu-link.active {
-            background: rgba(255,255,255,0.2);
-            font-weight: 600;
-        }
-
-        .main-content {
-            margin-left: 260px;
-            padding: 30px 40px;
-            min-height: 100vh;
-        }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .page-title {
-            font-family: 'Jost', sans-serif;
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--text-100);
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 16px;
-            background: var(--white-00);
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--blue-100), var(--blue-150));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--white-00);
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: var(--white-00);
-            padding: 24px;
-            border-radius: 8px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-            border-left: 4px solid var(--blue-100);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-        }
-
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .stat-title {
-            font-size: 12px;
-            color: var(--text-60);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-        }
-
-        .stat-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 8px;
-            background: var(--dentalink-blue-100);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-        }
-
-        .stat-value {
-            font-family: 'Jost', sans-serif;
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--text-100);
-            margin-bottom: 8px;
-        }
-
-        .stat-change {
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-weight: 500;
-        }
-
-        .stat-change.positive {
-            color: var(--blue-100);
-        }
-
-        .stat-change.negative {
-            color: #f56565;
-        }
-
-        .panel {
-            background: var(--white-00);
-            border-radius: 8px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        }
-
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--blue-40);
-        }
-
-        .panel-title {
-            font-family: 'Jost', sans-serif;
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--text-100);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            font-weight: 600;
-            color: var(--text-80);
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        input, textarea, select {
-            padding: 12px 16px;
-            background: var(--white-00);
-            border: 1px solid var(--blue-60);
-            border-radius: 6px;
-            color: var(--text-100);
-            font-size: 14px;
-            transition: all 0.2s;
-            font-family: 'Inter', sans-serif;
-        }
-
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--blue-100);
-            box-shadow: 0 0 0 3px var(--dentalink-blue-100);
-        }
-
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .btn {
-            grid-column-gap: 8px;
-            grid-row-gap: 8px;
-            border-radius: 6px;
-            flex-direction: row;
-            flex: none;
-            justify-content: center;
-            align-items: center;
-            padding: 16px 32px;
-            line-height: 120%;
-            text-decoration: none;
-            transition: all .2s;
-            display: inline-flex;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            text-align: center;
-        }
-
-        .btn-primary {
-            border: 1px solid var(--blue-100);
-            background-color: var(--blue-100);
-            color: var(--white-00);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--blue-150);
-            border-color: var(--blue-150);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(8, 121, 202, 0.3);
-        }
-
-        .btn-secondary {
-            background: var(--blue-40);
-            color: var(--text-80);
-            border: 1px solid var(--blue-60);
-        }
-
-        .btn-secondary:hover {
-            background: var(--blue-60);
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .btn-edit {
-            background: #fbb040;
-            color: var(--white-00);
-            padding: 8px 16px;
-            font-size: 13px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .btn-edit:hover {
-            background: #f59e0b;
-            transform: translateY(-1px);
-        }
-
-        .btn-delete {
-            background: #fc8181;
-            color: var(--white-00);
-            padding: 8px 16px;
-            font-size: 13px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .btn-delete:hover {
-            background: #f56565;
-            transform: translateY(-1px);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        thead {
-            background: var(--grey-20);
-        }
-
-        th {
-            padding: 14px 16px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 12px;
-            color: var(--text-80);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid var(--blue-60);
-        }
-
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--blue-40);
-            font-size: 14px;
-            color: var(--text-80);
-        }
-
-        tbody tr {
-            transition: all 0.2s;
-        }
-
-        tbody tr:hover {
-            background: var(--grey-20);
-        }
-
-        .badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .badge-active {
-            background: var(--dentalink-blue-100);
-            color: var(--blue-200);
-        }
-
-        .badge-inactive {
-            background: #fed7d7;
-            color: #742a2a;
-        }
-
-        .filters-bar {
-            display: flex;
-            gap: 15px;
-            align-items: flex-end;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .filter-group label {
-            font-size: 13px;
-            margin: 0;
-        }
-
-        .filter-group select {
-            padding: 10px 14px;
-            min-width: 200px;
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 2px solid var(--blue-40);
-        }
-
-        .pagination-info {
-            color: var(--text-60);
-            font-size: 14px;
-        }
-
-        .pagination-controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .pagination-btn {
-            padding: 10px 20px;
-            background: var(--white-00);
-            color: var(--text-80);
-            border: 1px solid var(--blue-60);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .pagination-btn:hover:not(:disabled) {
-            background: var(--blue-40);
-            border-color: var(--blue-100);
-            color: var(--blue-100);
-        }
-
-        .pagination-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        .page-size-selector {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .page-size-selector select {
-            padding: 8px 12px;
-            background: var(--white-00);
-            border: 1px solid var(--blue-60);
-            border-radius: 6px;
-        }
-
-        .alert {
-            padding: 16px 20px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            display: none;
-            align-items: center;
-            gap: 12px;
-            font-size: 14px;
-            animation: slideDown 0.3s ease;
-        }
-
-        .alert.show {
-            display: flex;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .alert-success {
-            background: var(--dentalink-blue-100);
-            color: var(--blue-200);
-            border-left: 4px solid var(--blue-100);
-        }
-
-        .alert-error {
-            background: #fed7d7;
-            color: #742a2a;
-            border-left: 4px solid #f56565;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-40);
-        }
-
-        .empty-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-
-        .loading {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--white-00);
-            padding: 30px 50px;
-            border-radius: 8px;
-            z-index: 9999;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-        }
-
-        .loading.show {
-            display: block;
-        }
-
-        .content-section {
-            display: none;
-        }
-
-        .content-section.active {
-            display: block;
-        }
-
-        @media (max-width: 1024px) {
-            .sidebar {
-                width: 80px;
-            }
-
-            .main-content {
-                margin-left: 80px;
-            }
-
-            .menu-link span {
-                display: none;
-            }
-
-            .logo {
-                font-size: 18px;
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 20px;
-            }
-
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .filters-bar {
-                flex-direction: column;
-            }
-
-            .filter-group select {
-                min-width: 100%;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-            }
-        }
-    </style>
+    <title>Dashboard - Promociones DX-RAY</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    <div class="loading" id="loading">⏳ Cargando...</div>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+            <div class="container mx-auto px-6 py-4">
+                <h1 class="text-3xl font-bold">🦷 Dashboard DX-RAY</h1>
+                <p class="text-blue-100">Gestión de Promociones y Sucursales</p>
+            </div>
+        </header>
 
-    <aside class="sidebar">
-        <div class="logo">🦷 Dental+</div>
-        <ul class="menu">
-            <li class="menu-item">
-                <a class="menu-link active" data-section="dashboard">
-                    📊 <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a class="menu-link" data-section="promociones">
-                    🎁 <span>Promociones</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a class="menu-link" data-section="sucursales">
-                    🏥 <span>Sucursales</span>
-                </a>
-            </li>
-        </ul>
-    </aside>
+        <div class="container mx-auto px-6 py-8">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Total Promociones</p>
+                            <p class="text-3xl font-bold text-gray-800" id="totalPromos">0</p>
+                        </div>
+                        <div class="bg-blue-100 rounded-full p-3">
+                            <i class="fas fa-tags text-blue-600 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
 
-    <main class="main-content">
-        <div class="top-bar">
-            <h1 class="page-title" id="pageTitle">Dashboard</h1>
-            <div class="user-info">
-                <div class="user-avatar">A</div>
-                <div>
-                    <div style="font-weight: 600; font-size: 14px;">Admin</div>
-                    <div style="font-size: 12px; color: var(--text-60);">Panel de Control</div>
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Promociones Activas</p>
+                            <p class="text-3xl font-bold text-gray-800" id="promosActivas">0</p>
+                        </div>
+                        <div class="bg-green-100 rounded-full p-3">
+                            <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Promociones Inactivas</p>
+                            <p class="text-3xl font-bold text-gray-800" id="promosInactivas">0</p>
+                        </div>
+                        <div class="bg-red-100 rounded-full p-3">
+                            <i class="fas fa-times-circle text-red-600 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Sucursales</p>
+                            <p class="text-3xl font-bold text-gray-800" id="totalSucursales">0</p>
+                        </div>
+                        <div class="bg-purple-100 rounded-full p-3">
+                            <i class="fas fa-building text-purple-600 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Promociones por Sucursal -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">📊 Promociones por Sucursal</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursal</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ciudad</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Promos</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Activas</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaSucursalesPromos" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">Cargando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Gestión de Promociones -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">📋 Gestión de Promociones</h3>
+                    <button onclick="mostrarFormNuevaPromocion()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                        <i class="fas fa-plus"></i>
+                        Nueva Promoción
+                    </button>
+                </div>
+
+                <!-- Filtros -->
+                <div class="mb-4 flex gap-4">
+                    <select id="filtroSucursal" onchange="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2">
+                        <option value="">Todas las sucursales</option>
+                    </select>
+                    <select id="filtroEstado" onchange="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2">
+                        <option value="">Todos los estados</option>
+                        <option value="true">Activas</option>
+                        <option value="false">Inactivas</option>
+                    </select>
+                    <input type="text" id="buscarPromo" placeholder="Buscar promoción..." onkeyup="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2 flex-1">
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Precio</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursales</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaPromociones" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">Cargando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Gestión de Sucursales -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">🏥 Sucursales Registradas</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ciudad</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teléfono</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Horarios</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaSucursales" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="4" class="px-6 py-4 text-center text-gray-500">Cargando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div id="alertSuccess" class="alert alert-success"></div>
-        <div id="alertError" class="alert alert-error"></div>
-
-        <section id="dashboard" class="content-section active">
-            <div class="dashboard-grid">
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div>
-                            <div class="stat-title">Total Promociones</div>
-                            <div class="stat-value" id="dashTotalPromos">0</div>
-                            <div class="stat-change positive">
-                                <span>↑</span> <span id="totalPromosTrend">100%</span> del total
-                            </div>
-                        </div>
-                        <div class="stat-icon">🎁</div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div>
-                            <div class="stat-title">Promociones Activas</div>
-                            <div class="stat-value" id="dashActivasPromos">0</div>
-                            <div class="stat-change positive" id="activasTrend">
-                                <span>↑</span> <span>0%</span> activas
-                            </div>
-                        </div>
-                        <div class="stat-icon">✅</div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div>
-                            <div class="stat-title">Promociones Inactivas</div>
-                            <div class="stat-value" id="dashInactivasPromos">0</div>
-                            <div class="stat-change negative" id="inactivasTrend">
-                                <span>↓</span> <span>0%</span> inactivas
-                            </div>
-                        </div>
-                        <div class="stat-icon">⏸️</div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div>
-                            <div class="stat-title">Sucursales</div>
-                            <div class="stat-value" id="dashTotalSucursales">0</div>
-                            <div class="stat-change positive">
-                                <span>🏥</span> <span>Activas</span>
-                            </div>
-                        </div>
-                        <div class="stat-icon">🏢</div>
-                    </div>
-                </div>
+    <!-- Modal Nueva Promoción -->
+    <div id="modalNuevaPromo" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">➕ Nueva Promoción</h3>
+                <button onclick="cerrarModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
             </div>
-
-            <div class="panel">
-                <div class="panel-header">
-                    <h3 class="panel-title">📊 Promociones por Sucursal</h3>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Sucursal</th>
-                            <th>Ciudad</th>
-                            <th>Total Promos</th>
-                            <th>Activas</th>
-                            <th>Inactivas</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sucursalesStatsTable"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="promociones" class="content-section">
-            <div class="panel">
-                <div class="panel-header">
-                    <h3 class="panel-title" id="formTitle">➕ Nueva Promoción</h3>
-                </div>
-                <form id="promocionForm">
-                    <input type="hidden" id="promoId">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="idSucursal">🏥 Sucursal *</label>
-                            <select id="idSucursal" required>
-                                <option value="">Cargando...</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="precio">💰 Precio</label>
-                            <input type="text" id="precio" placeholder="Ej: $999">
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="descripcion">📝 Descripción *</label>
-                            <textarea id="descripcion" required placeholder="Descripción completa de la promoción"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="activa">✅ Estado</label>
-                            <select id="activa">
-                                <option value="1">Activa</option>
-                                <option value="0">Inactiva</option>
-                            </select>
-                        </div>
+            <form id="formNuevaPromo" onsubmit="guardarPromocion(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                        <textarea id="descripcion" required class="w-full border border-gray-300 rounded-lg px-4 py-2" rows="3"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">
-                        <span id="btnText">💾 Guardar Promoción</span>
-                    </button>
-                    <button type="button" class="btn btn-secondary" onclick="cancelarEdicion()">
-                        🔄 Cancelar
-                    </button>
-                </form>
-            </div>
-
-            <div class="panel">
-                <div class="panel-header">
-                    <h3 class="panel-title">📋 Promociones Registradas</h3>
-                    <button class="btn btn-secondary" onclick="cargarPromociones()">
-                        🔄 Recargar
-                    </button>
-                </div>
-
-                <div class="filters-bar">
-                    <div class="filter-group">
-                        <label>🔍 Filtrar por Sucursal</label>
-                        <select id="filtroSucursal" onchange="aplicarFiltros()">
-                            <option value="">Todas las sucursales</option>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Precio</label>
+                        <input type="number" id="precio" step="0.01" required class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                        <select id="activa" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                            <option value="true">Activa</option>
+                            <option value="false">Inactiva</option>
                         </select>
                     </div>
-
-                    <div class="page-size-selector">
-                        <label style="color: var(--text-60); font-size: 13px;">Mostrar:</label>
-                        <select id="pageSize" onchange="cambiarTamañoPagina()">
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                        <span style="color: var(--text-60); font-size: 13px;">por página</span>
-                    </div>
-                </div>
-
-                <div id="emptyState" class="empty-state" style="display:none;">
-                    <div class="empty-icon">📭</div>
-                    <h3>No hay promociones</h3>
-                    <p>No se encontraron promociones con los filtros seleccionados</p>
-                </div>
-
-                <div id="tableContainer">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Sucursal</th>
-                                <th>Descripción</th>
-                                <th>Precio</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="promocionesTable"></tbody>
-                    </table>
-
-                    <div class="pagination">
-                        <div class="pagination-info" id="paginationInfo">
-                            Mostrando 0 de 0 promociones
-                        </div>
-                        <div class="pagination-controls">
-                            <button class="pagination-btn" onclick="cambiarPagina(-1)" id="btnPrev">
-                                ◀ Anterior
-                            </button>
-                            <span style="color: var(--text-60); font-weight: 600;" id="pageNumber">
-                                Página 1
-                            </span>
-                            <button class="pagination-btn" onclick="cambiarPagina(1)" id="btnNext">
-                                Siguiente ▶
-                            </button>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Asignar a Sucursales</label>
+                        <div id="checkboxesSucursales" class="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-4">
+                            <!-- Se llenan dinámicamente -->
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <section id="sucursales" class="content-section">
-            <div class="panel">
-                <div class="panel-header">
-                    <h3 class="panel-title">🏥 Sucursales Registradas</h3>
+                <div class="flex gap-4 mt-6">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition">
+                        Guardar Promoción
+                    </button>
+                    <button type="button" onclick="cerrarModal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium transition">
+                        Cancelar
+                    </button>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Ciudad</th>
-                            <th>Dirección</th>
-                            <th>Teléfono</th>
-                            <th>Horarios</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sucursalesTable"></tbody>
-                </table>
-            </div>
-        </section>
-    </main>
+            </form>
+        </div>
+    </div>
 
     <script>
-        const SUPABASE_URL = 'https://sdqmuabsdsghptbttwiy.supabase.co/rest/v1';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkcW11YWJzZHNnaHB0YnR0d2l5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MTQ2NjMsImV4cCI6MjA4NTk5MDY2M30.Ki1AazQ5A7QcQuA0wUOjujGAGn1k749VRK2qoD7vNR0';
+        // CONFIGURA TUS CREDENCIALES AQUÍ
+        const SUPABASE_URL = 'TU_SUPABASE_URL';
+        const SUPABASE_KEY = 'TU_SUPABASE_ANON_KEY';
 
         const headers = {
             'apikey': SUPABASE_KEY,
@@ -888,344 +216,245 @@
             'Prefer': 'return=representation'
         };
 
-        let modoEdicion = false;
         let promociones = [];
         let sucursales = [];
-        let promocionesFiltradas = [];
-        let paginaActual = 1;
-        let itemsPorPagina = 10;
+        let relaciones = [];
 
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('🦷 Panel Admin cargado');
-
-            document.querySelectorAll('.menu-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const section = this.getAttribute('data-section');
-                    showSection(section);
-                });
-            });
-
-            cargarSucursales();
-            cargarPromociones();
+            cargarDatos();
         });
 
-        function showSection(sectionName) {
-            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
-
-            const section = document.getElementById(sectionName);
-            if (section) {
-                section.classList.add('active');
-            }
-
-            const activeLink = document.querySelector(`[data-section="${sectionName}"]`);
-            if (activeLink) {
-                activeLink.classList.add('active');
-            }
-
-            const titles = {
-                'dashboard': 'Dashboard',
-                'promociones': 'Gestión de Promociones',
-                'sucursales': 'Sucursales'
-            };
-            document.getElementById('pageTitle').textContent = titles[sectionName] || 'Panel Admin';
-
-            if (sectionName === 'dashboard') {
-                actualizarDashboard();
-            } else if (sectionName === 'sucursales') {
-                renderizarSucursales();
+        async function cargarDatos() {
+            try {
+                await Promise.all([
+                    cargarSucursales(),
+                    cargarPromociones(),
+                    cargarRelaciones()
+                ]);
+                actualizarUI();
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                alert('Error al cargar los datos. Revisa la consola.');
             }
         }
 
         async function cargarSucursales() {
-            try {
-                showLoading(true);
-                const response = await fetch(SUPABASE_URL + '/sucursales?select=*&order=nombre_sucursal', {
-                    headers: headers
-                });
-
-                sucursales = await response.json();
-
-                const select = document.getElementById('idSucursal');
-                select.innerHTML = '<option value="">Selecciona una sucursal</option>';
-                sucursales.forEach(suc => {
-                    select.innerHTML += `<option value="${suc.id_sucursal}">${suc.nombre_sucursal} - ${suc.ciudad}</option>`;
-                });
-
-                const filtroSelect = document.getElementById('filtroSucursal');
-                filtroSelect.innerHTML = '<option value="">Todas las sucursales</option>';
-                sucursales.forEach(suc => {
-                    filtroSelect.innerHTML += `<option value="${suc.id_sucursal}">${suc.nombre_sucursal} - ${suc.ciudad}</option>`;
-                });
-
-                console.log('✅ Sucursales cargadas:', sucursales.length);
-            } catch (error) {
-                console.error('❌ Error:', error);
-                mostrarAlerta('Error cargando sucursales', 'error');
-            } finally {
-                showLoading(false);
-            }
+            const response = await fetch(`${SUPABASE_URL}/sucursales?select=*`, { headers });
+            sucursales = await response.json();
+            llenarSelectSucursales();
+            llenarCheckboxesSucursales();
         }
 
         async function cargarPromociones() {
-            try {
-                showLoading(true);
-                const response = await fetch(SUPABASE_URL + '/promociones?select=*&order=id.desc', {
-                    headers: headers
-                });
-
-                const data = await response.json();
-                promociones = Array.isArray(data) ? data : [];
-
-                aplicarFiltros();
-                actualizarDashboard();
-
-                console.log('✅ Promociones cargadas:', promociones.length);
-            } catch (error) {
-                console.error('❌ Error:', error);
-                mostrarAlerta('Error cargando promociones', 'error');
-                promociones = [];
-                aplicarFiltros();
-            } finally {
-                showLoading(false);
-            }
+            const response = await fetch(`${SUPABASE_URL}/promociones?select=*`, { headers });
+            promociones = await response.json();
         }
 
-        function actualizarDashboard() {
-            const total = promociones.length;
-            const activas = promociones.filter(p => p.activa == 1).length;
-            const inactivas = total - activas;
-            const porcentajeActivas = total > 0 ? Math.round((activas / total) * 100) : 0;
-            const porcentajeInactivas = total > 0 ? Math.round((inactivas / total) * 100) : 0;
-
-            document.getElementById('dashTotalPromos').textContent = total;
-            document.getElementById('dashActivasPromos').textContent = activas;
-            document.getElementById('dashInactivasPromos').textContent = inactivas;
-            document.getElementById('dashTotalSucursales').textContent = sucursales.length;
-
-            document.getElementById('activasTrend').innerHTML = `<span>↑</span> <span>${porcentajeActivas}%</span> activas`;
-            document.getElementById('inactivasTrend').innerHTML = `<span>↓</span> <span>${porcentajeInactivas}%</span> inactivas`;
-
-            const sucursalesStats = sucursales.map(suc => {
-                const promosSuc = promociones.filter(p => p.id_sucursal === suc.id_sucursal);
-                const activasSuc = promosSuc.filter(p => p.activa == 1).length;
-                return {
-                    nombre: suc.nombre_sucursal,
-                    ciudad: suc.ciudad,
-                    total: promosSuc.length,
-                    activas: activasSuc,
-                    inactivas: promosSuc.length - activasSuc
-                };
-            });
-
-            const tbody = document.getElementById('sucursalesStatsTable');
-            tbody.innerHTML = sucursalesStats.map(stat => `
-                <tr>
-                    <td><strong>${stat.nombre}</strong></td>
-                    <td>${stat.ciudad}</td>
-                    <td><strong>${stat.total}</strong></td>
-                    <td><span class="badge badge-active">${stat.activas}</span></td>
-                    <td><span class="badge badge-inactive">${stat.inactivas}</span></td>
-                </tr>
-            `).join('');
+        async function cargarRelaciones() {
+            const response = await fetch(`${SUPABASE_URL}/sucursal_promocion?select=*`, { headers });
+            relaciones = await response.json();
         }
 
-        function renderizarSucursales() {
-            const tbody = document.getElementById('sucursalesTable');
-            tbody.innerHTML = sucursales.map(suc => `
-                <tr>
-                    <td><strong>${suc.nombre_sucursal}</strong></td>
-                    <td>${suc.ciudad || 'N/A'}</td>
-                    <td>${suc.direccion || 'N/A'}</td>
-                    <td>${suc.telefono || 'N/A'}</td>
-                    <td>${suc.horarios || 'N/A'}</td>
-                </tr>
-            `).join('');
+        function actualizarUI() {
+            actualizarStats();
+            renderizarTablaPromociones();
+            renderizarTablaSucursales();
+            renderizarPromosPorSucursal();
         }
 
-        function aplicarFiltros() {
-            const filtroSucursal = document.getElementById('filtroSucursal').value;
-            promocionesFiltradas = promociones.filter(promo => {
-                if (filtroSucursal && promo.id_sucursal != filtroSucursal) return false;
-                return true;
-            });
-            paginaActual = 1;
-            renderizarPromociones();
+        function actualizarStats() {
+            document.getElementById('totalPromos').textContent = promociones.length;
+            document.getElementById('promosActivas').textContent = promociones.filter(p => p.activa).length;
+            document.getElementById('promosInactivas').textContent = promociones.filter(p => !p.activa).length;
+            document.getElementById('totalSucursales').textContent = sucursales.length;
         }
 
-        function cambiarTamañoPagina() {
-            itemsPorPagina = parseInt(document.getElementById('pageSize').value);
-            paginaActual = 1;
-            renderizarPromociones();
-        }
-
-        function cambiarPagina(direccion) {
-            paginaActual += direccion;
-            renderizarPromociones();
-        }
-
-        function renderizarPromociones() {
-            const emptyState = document.getElementById('emptyState');
-            const tableContainer = document.getElementById('tableContainer');
-            const tbody = document.getElementById('promocionesTable');
-
-            if (promocionesFiltradas.length === 0) {
-                emptyState.style.display = 'block';
-                tableContainer.style.display = 'none';
+        function renderizarTablaPromociones() {
+            const tbody = document.getElementById('tablaPromociones');
+            if (promociones.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No hay promociones registradas</td></tr>';
                 return;
             }
 
-            emptyState.style.display = 'none';
-            tableContainer.style.display = 'block';
+            tbody.innerHTML = promociones.map(promo => {
+                const sucursalesAsignadas = relaciones.filter(r => r.id_promocion === promo.id_promocion);
+                const nombresSucursales = sucursalesAsignadas.map(r => {
+                    const suc = sucursales.find(s => s.id_sucursal === r.id_sucursal);
+                    return suc ? suc.nombre_sucursal : '';
+                }).filter(n => n).join(', ');
 
-            const totalPaginas = Math.ceil(promocionesFiltradas.length / itemsPorPagina);
-            const inicio = (paginaActual - 1) * itemsPorPagina;
-            const fin = inicio + itemsPorPagina;
-            const promocionesPagina = promocionesFiltradas.slice(inicio, fin);
-
-            tbody.innerHTML = promocionesPagina.map(promo => {
-                const sucursalData = sucursales.find(s => s.id_sucursal === promo.id_sucursal);
-                const nombreSucursal = sucursalData?.nombre_sucursal || promo.nombre_sucursal || 'N/A';
-                const ciudadSucursal = sucursalData?.ciudad || '';
-                const estadoBadge = promo.activa == 1 ? 
-                    '<span class="badge badge-active">✓ Activa</span>' : 
-                    '<span class="badge badge-inactive">✗ Inactiva</span>';
-                const descripcionCorta = promo.descripcion.length > 80 ? 
-                    promo.descripcion.substring(0, 80) + '...' : promo.descripcion;
-
-                const promoJSON = JSON.stringify(promo).replace(/"/g, '&quot;');
-
-                return `<tr>
-                    <td><strong>${nombreSucursal}</strong><br><small style="color: var(--text-60);">${ciudadSucursal}</small></td>
-                    <td><small>${descripcionCorta}</small></td>
-                    <td><strong>${promo.precio || 'N/A'}</strong></td>
-                    <td>${estadoBadge}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-edit" onclick='editarPromocion(${promoJSON})'>✏️ Editar</button>
-                            <button class="btn-delete" onclick="eliminarPromocion(${promo.id})">🗑️ Eliminar</button>
-                        </div>
-                    </td>
-                </tr>`;
+                return `
+                    <tr>
+                        <td class="px-6 py-4 text-sm text-gray-900">${promo.descripcion.substring(0, 80)}...</td>
+                        <td class="px-6 py-4 text-sm font-semibold text-green-600">$${promo.precio.toFixed(2)}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs rounded-full ${promo.activa ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${promo.activa ? 'Activa' : 'Inactiva'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${sucursalesAsignadas.length} sucursales</td>
+                        <td class="px-6 py-4">
+                            <button onclick="toggleEstadoPromo(${promo.id_promocion}, ${promo.activa})" 
+                                    class="text-blue-600 hover:text-blue-800 mr-3">
+                                <i class="fas fa-toggle-${promo.activa ? 'on' : 'off'}"></i>
+                            </button>
+                            <button onclick="eliminarPromo(${promo.id_promocion})" 
+                                    class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
             }).join('');
-
-            document.getElementById('paginationInfo').textContent = 
-                `Mostrando ${inicio + 1}-${Math.min(fin, promocionesFiltradas.length)} de ${promocionesFiltradas.length} promociones`;
-            document.getElementById('pageNumber').textContent = `Página ${paginaActual} de ${totalPaginas}`;
-            document.getElementById('btnPrev').disabled = paginaActual === 1;
-            document.getElementById('btnNext').disabled = paginaActual >= totalPaginas;
         }
 
-        // ⭐⭐⭐ AQUÍ ESTÁ EL CAMBIO IMPORTANTE ⭐⭐⭐
-        document.getElementById('promocionForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        function renderizarTablaSucursales() {
+            const tbody = document.getElementById('tablaSucursales');
+            tbody.innerHTML = sucursales.map(suc => `
+                <tr>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">${suc.nombre_sucursal}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${suc.ciudad || '-'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${suc.telefono || '-'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${suc.horarios || '-'}</td>
+                </tr>
+            `).join('');
+        }
 
-            const datos = {
-                id_sucursal: parseInt(document.getElementById('idSucursal').value),
-                descripcion: document.getElementById('descripcion').value,
-                precio: document.getElementById('precio').value || null,
-                activa: parseInt(document.getElementById('activa').value),
-                nombre_sucursal: sucursales.find(s => s.id_sucursal === parseInt(document.getElementById('idSucursal').value))?.nombre_sucursal || ''
-            };
+        function renderizarPromosPorSucursal() {
+            const tbody = document.getElementById('tablaSucursalesPromos');
+            tbody.innerHTML = sucursales.map(suc => {
+                const promosEnSucursal = relaciones.filter(r => r.id_sucursal === suc.id_sucursal);
+                const promosActivas = promosEnSucursal.filter(r => {
+                    const promo = promociones.find(p => p.id_promocion === r.id_promocion);
+                    return promo && promo.activa;
+                }).length;
 
-            try {
-                showLoading(true);
+                return `
+                    <tr>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900">${suc.nombre_sucursal}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${suc.ciudad || '-'}</td>
+                        <td class="px-6 py-4 text-sm font-semibold text-blue-600">${promosEnSucursal.length}</td>
+                        <td class="px-6 py-4 text-sm font-semibold text-green-600">${promosActivas}</td>
+                        <td class="px-6 py-4">
+                            <button onclick="verPromosSucursal(${suc.id_sucursal})" 
+                                    class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-eye"></i> Ver
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
 
-                if (modoEdicion) {
-                    const id = document.getElementById('promoId').value;
-                    const response = await fetch(SUPABASE_URL + '/promociones?id=eq.' + id, {
-                        method: 'PATCH',
-                        headers: headers,
-                        body: JSON.stringify(datos)
-                    });
+        function llenarSelectSucursales() {
+            const select = document.getElementById('filtroSucursal');
+            select.innerHTML = '<option value="">Todas las sucursales</option>' +
+                sucursales.map(s => `<option value="${s.id_sucursal}">${s.nombre_sucursal}</option>`).join('');
+        }
 
-                    if (!response.ok) {
-                        const error = await response.json();
-                        throw new Error(JSON.stringify(error));
-                    }
+        function llenarCheckboxesSucursales() {
+            const container = document.getElementById('checkboxesSucursales');
+            container.innerHTML = sucursales.map(s => `
+                <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                    <input type="checkbox" name="sucursales" value="${s.id_sucursal}" class="form-checkbox h-4 w-4 text-blue-600">
+                    <span class="text-sm">${s.nombre_sucursal} - ${s.ciudad}</span>
+                </label>
+            `).join('');
+        }
 
-                    mostrarAlerta('✅ Promoción actualizada exitosamente', 'success');
-                } else {
-                    const response = await fetch(SUPABASE_URL + '/promociones', {
-                        method: 'POST',
-                        headers: headers,
-                        body: JSON.stringify(datos)
-                    });
+        function mostrarFormNuevaPromocion() {
+            document.getElementById('modalNuevaPromo').classList.remove('hidden');
+        }
 
-                    if (!response.ok) {
-                        const error = await response.json();
-                        throw new Error(JSON.stringify(error));
-                    }
+        function cerrarModal() {
+            document.getElementById('modalNuevaPromo').classList.add('hidden');
+            document.getElementById('formNuevaPromo').reset();
+        }
 
-                    mostrarAlerta('✅ Promoción creada exitosamente', 'success');
-                }
+        async function guardarPromocion(event) {
+            event.preventDefault();
 
-                cancelarEdicion();
-                cargarPromociones();
-            } catch (error) {
-                console.error('❌ ERROR:', error);
-                mostrarAlerta('❌ Error: ' + error.message, 'error');
-            } finally {
-                showLoading(false);
+            const descripcion = document.getElementById('descripcion').value;
+            const precio = parseFloat(document.getElementById('precio').value);
+            const activa = document.getElementById('activa').value === 'true';
+            const sucursalesSeleccionadas = Array.from(document.querySelectorAll('input[name="sucursales"]:checked')).map(cb => parseInt(cb.value));
+
+            if (sucursalesSeleccionadas.length === 0) {
+                alert('Selecciona al menos una sucursal');
+                return;
             }
-        });
-
-        function editarPromocion(promo) {
-            showSection('promociones');
-            modoEdicion = true;
-            document.getElementById('formTitle').textContent = '✏️ Editar Promoción';
-            document.getElementById('btnText').textContent = '💾 Actualizar';
-            document.getElementById('promoId').value = promo.id;
-            document.getElementById('idSucursal').value = promo.id_sucursal || '';
-            document.getElementById('descripcion').value = promo.descripcion || '';
-            document.getElementById('precio').value = promo.precio || '';
-            document.getElementById('activa').value = promo.activa || 0;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function cancelarEdicion() {
-            modoEdicion = false;
-            document.getElementById('formTitle').textContent = '➕ Nueva Promoción';
-            document.getElementById('btnText').textContent = '💾 Guardar Promoción';
-            document.getElementById('promocionForm').reset();
-            document.getElementById('promoId').value = '';
-        }
-
-        async function eliminarPromocion(id) {
-            if (!confirm('¿Estás seguro de eliminar esta promoción?')) return;
 
             try {
-                showLoading(true);
-                await fetch(SUPABASE_URL + '/promociones?id=eq.' + id, {
-                    method: 'DELETE',
-                    headers: headers
+                // 1. Crear la promoción
+                const responsePromo = await fetch(`${SUPABASE_URL}/promociones`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ descripcion, precio, activa })
                 });
-                mostrarAlerta('✅ Promoción eliminada exitosamente', 'success');
-                cargarPromociones();
+                const [nuevaPromo] = await responsePromo.json();
+
+                // 2. Crear las relaciones
+                const relacionesNuevas = sucursalesSeleccionadas.map(id_suc => ({
+                    id_sucursal: id_suc,
+                    id_promocion: nuevaPromo.id_promocion
+                }));
+
+                await fetch(`${SUPABASE_URL}/sucursal_promocion`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(relacionesNuevas)
+                });
+
+                alert('✅ Promoción creada exitosamente');
+                cerrarModal();
+                await cargarDatos();
             } catch (error) {
-                console.error('❌ Error:', error);
-                mostrarAlerta('❌ Error al eliminar', 'error');
-            } finally {
-                showLoading(false);
+                console.error('Error:', error);
+                alert('Error al guardar la promoción');
             }
         }
 
-        function mostrarAlerta(mensaje, tipo) {
-            const alertId = tipo === 'success' ? 'alertSuccess' : 'alertError';
-            const alert = document.getElementById(alertId);
-            alert.textContent = mensaje;
-            alert.classList.add('show');
-            setTimeout(() => alert.classList.remove('show'), 5000);
+        async function toggleEstadoPromo(id, estadoActual) {
+            try {
+                await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${id}`, {
+                    method: 'PATCH',
+                    headers,
+                    body: JSON.stringify({ activa: !estadoActual })
+                });
+                await cargarDatos();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cambiar estado');
+            }
         }
 
-        function showLoading(show) {
-            const loading = document.getElementById('loading');
-            if (show) {
-                loading.classList.add('show');
-            } else {
-                loading.classList.remove('show');
+        async function eliminarPromo(id) {
+            if (!confirm('¿Eliminar esta promoción? Se eliminarán también sus asignaciones a sucursales.')) return;
+
+            try {
+                await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${id}`, {
+                    method: 'DELETE',
+                    headers
+                });
+                await cargarDatos();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar');
             }
+        }
+
+        function filtrarPromociones() {
+            // Implementar filtrado (opcional)
+            renderizarTablaPromociones();
+        }
+
+        function verPromosSucursal(idSucursal) {
+            const suc = sucursales.find(s => s.id_sucursal === idSucursal);
+            const promosIds = relaciones.filter(r => r.id_sucursal === idSucursal).map(r => r.id_promocion);
+            const promosSucursal = promociones.filter(p => promosIds.includes(p.id_promocion));
+
+            const lista = promosSucursal.map(p => `• ${p.descripcion} - $${p.precio}`).join('\n');
+            alert(`Promociones en ${suc.nombre_sucursal}:\n\n${lista}`);
         }
     </script>
 </body>
