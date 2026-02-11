@@ -11,7 +11,6 @@
         .tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; }
         .section-hidden { display: none; }
 
-        /* Estilos para notificaciones toast */
         .toast {
             position: fixed;
             top: 20px;
@@ -66,6 +65,16 @@
 
         .toast.hiding {
             animation: slideOut 0.3s ease-out forwards;
+        }
+
+        .badge-vencida {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 8px;
         }
     </style>
 </head>
@@ -221,12 +230,14 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Precio</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vigencia</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Creada</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursales</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tablaPromociones" class="bg-white divide-y divide-gray-200">
-                                <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
+                                <tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -288,16 +299,36 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
                         <textarea id="descripcion" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3"></textarea>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Precio</label>
-                        <input type="number" id="precio" step="0.01" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Precio</label>
+                            <input type="number" id="precio" step="0.01" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                            <select id="activa" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="true">Activa</option>
+                                <option value="false">Inactiva</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
-                        <select id="activa" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option value="true">Activa</option>
-                            <option value="false">Inactiva</option>
-                        </select>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-calendar-alt text-blue-600"></i> Fecha Inicio (opcional)
+                            </label>
+                            <input type="date" id="fechaInicio" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-calendar-check text-red-600"></i> Fecha Fin (opcional)
+                            </label>
+                            <input type="date" id="fechaFin" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 bg-blue-50 p-3 rounded">
+                        <i class="fas fa-info-circle text-blue-600"></i> 
+                        <strong>Nota:</strong> Si estableces fecha de fin, la promoción se desactivará automáticamente al pasar esa fecha.
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Asignar a Sucursales</label>
@@ -390,9 +421,10 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             cargarDatos();
+            // Verificar promociones vencidas cada minuto
+            setInterval(verificarPromocionesVencidas, 60000);
         });
 
-        // Función para mostrar notificaciones toast bonitas
         function mostrarToast(mensaje, tipo = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast toast-${tipo}`;
@@ -449,7 +481,7 @@
         }
 
         async function cargarPromociones() {
-            const response = await fetch(`${SUPABASE_URL}/promociones?select=*`, { headers });
+            const response = await fetch(`${SUPABASE_URL}/promociones?select=*&order=created_at.desc`, { headers });
             promociones = await response.json();
             aplicarFiltrosActuales();
         }
@@ -457,6 +489,31 @@
         async function cargarRelaciones() {
             const response = await fetch(`${SUPABASE_URL}/sucursal_promocion?select=*`, { headers });
             relaciones = await response.json();
+        }
+
+        async function verificarPromocionesVencidas() {
+            const hoy = new Date().toISOString().split('T')[0];
+            let desactivadas = 0;
+
+            for (const promo of promociones) {
+                if (promo.activa && promo.fecha_fin && promo.fecha_fin < hoy) {
+                    try {
+                        await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${promo.id_promocion}`, {
+                            method: 'PATCH',
+                            headers,
+                            body: JSON.stringify({ activa: false })
+                        });
+                        desactivadas++;
+                    } catch (error) {
+                        console.error('Error desactivando promoción vencida:', error);
+                    }
+                }
+            }
+
+            if (desactivadas > 0) {
+                await cargarDatos();
+                mostrarToast(`${desactivadas} promoción(es) vencida(s) desactivada(s)`, 'warning');
+            }
         }
 
         function aplicarFiltrosActuales() {
@@ -500,7 +557,6 @@
         }
 
         function cambiarSeccion(seccion) {
-            // Recargar datos al cambiar de sección
             cargarDatos();
 
             document.getElementById('section-dashboard').classList.add('section-hidden');
@@ -521,10 +577,28 @@
             renderizarTablaPromociones();
         }
 
+        function formatearFecha(fecha) {
+            if (!fecha) return '-';
+            const [year, month, day] = fecha.split('-');
+            return `${day}/${month}/${year}`;
+        }
+
+        function formatearFechaCreacion(timestamp) {
+            if (!timestamp) return '-';
+            const fecha = new Date(timestamp);
+            return fecha.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function estaVencida(fechaFin) {
+            if (!fechaFin) return false;
+            const hoy = new Date().toISOString().split('T')[0];
+            return fechaFin < hoy;
+        }
+
         function renderizarTablaPromociones() {
             const tbody = document.getElementById('tablaPromociones');
             if (promocionesFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No hay promociones</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">No hay promociones</td></tr>';
                 document.getElementById('infoPromos').textContent = '';
                 document.getElementById('paginacionPromos').innerHTML = '';
                 return;
@@ -537,16 +611,25 @@
 
             tbody.innerHTML = promosPagina.map(promo => {
                 const sucursalesAsignadas = relaciones.filter(r => r.id_promocion === promo.id_promocion);
+                const vencida = estaVencida(promo.fecha_fin);
+                const vigencia = promo.fecha_inicio || promo.fecha_fin 
+                    ? `${formatearFecha(promo.fecha_inicio)} - ${formatearFecha(promo.fecha_fin)}`
+                    : 'Sin límite';
 
                 return `
                     <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 text-sm text-gray-900">${promo.descripcion.substring(0, 60)}${promo.descripcion.length > 60 ? '...' : ''}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            ${promo.descripcion.substring(0, 50)}${promo.descripcion.length > 50 ? '...' : ''}
+                            ${vencida && promo.activa ? '<span class="badge-vencida">VENCIDA</span>' : ''}
+                        </td>
                         <td class="px-6 py-4 text-sm font-semibold text-green-600">$${Number(promo.precio).toFixed(2)}</td>
                         <td class="px-6 py-4">
                             <span class="px-2 py-1 text-xs rounded-full ${promo.activa ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
                                 ${promo.activa ? '✓ Activa' : '✗ Inactiva'}
                             </span>
                         </td>
+                        <td class="px-6 py-4 text-xs text-gray-600">${vigencia}</td>
+                        <td class="px-6 py-4 text-xs text-gray-500">${formatearFechaCreacion(promo.created_at)}</td>
                         <td class="px-6 py-4 text-sm font-semibold text-blue-600">${sucursalesAsignadas.length}</td>
                         <td class="px-6 py-4 flex gap-2">
                             <button onclick="editarPromocion(${promo.id_promocion})" 
@@ -694,6 +777,8 @@
             document.getElementById('descripcion').value = promo.descripcion;
             document.getElementById('precio').value = promo.precio;
             document.getElementById('activa').value = promo.activa.toString();
+            document.getElementById('fechaInicio').value = promo.fecha_inicio || '';
+            document.getElementById('fechaFin').value = promo.fecha_fin || '';
 
             const sucursalesAsignadas = relaciones.filter(r => r.id_promocion === idPromocion).map(r => r.id_sucursal);
             llenarCheckboxesSucursales(sucursalesAsignadas);
@@ -708,6 +793,8 @@
             const descripcion = document.getElementById('descripcion').value;
             const precio = parseFloat(document.getElementById('precio').value);
             const activa = document.getElementById('activa').value === 'true';
+            const fechaInicio = document.getElementById('fechaInicio').value || null;
+            const fechaFin = document.getElementById('fechaFin').value || null;
             const sucursalesSeleccionadas = Array.from(document.querySelectorAll('input[name="sucursales"]:checked')).map(cb => parseInt(cb.value));
 
             if (sucursalesSeleccionadas.length === 0) {
@@ -722,7 +809,7 @@
                     await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${idEditar}`, {
                         method: 'PATCH',
                         headers,
-                        body: JSON.stringify({ descripcion, precio, activa })
+                        body: JSON.stringify({ descripcion, precio, activa, fecha_inicio: fechaInicio, fecha_fin: fechaFin })
                     });
                     idPromocion = parseInt(idEditar);
 
@@ -734,7 +821,7 @@
                     const responsePromo = await fetch(`${SUPABASE_URL}/promociones`, {
                         method: 'POST',
                         headers,
-                        body: JSON.stringify({ descripcion, precio, activa })
+                        body: JSON.stringify({ descripcion, precio, activa, fecha_inicio: fechaInicio, fecha_fin: fechaFin })
                     });
                     const [nuevaPromo] = await responsePromo.json();
                     idPromocion = nuevaPromo.id_promocion;
@@ -786,7 +873,6 @@
                 mostrarToast('Promoción eliminada correctamente', 'success');
                 await cargarDatos();
             } catch (error) {
-                console.error('Error:', error);
                 mostrarToast('Error al eliminar', 'error');
             }
         }
@@ -866,7 +952,6 @@
                 mostrarToast('Sucursal eliminada correctamente', 'success');
                 await cargarDatos();
             } catch (error) {
-                console.error('Error:', error);
                 mostrarToast('Error al eliminar', 'error');
             }
         }
