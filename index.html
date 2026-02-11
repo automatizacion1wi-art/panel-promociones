@@ -449,9 +449,9 @@
         const SUPABASE_URL = 'https://sdqmuabsdsghptbttwiy.supabase.co/rest/v1';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkcW11YWJzZHNnaHB0YnR0d2l5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MTQ2NjMsImV4cCI6MjA4NTk5MDY2M30.Ki1AazQ5A7QcQuA0wUOjujGAGn1k749VRK2qoD7vNR0';
 
-        // URL de tu API de Dentalink
+        // 🔧 CONFIGURA AQUÍ TU TOKEN DE DENTALINK
         const DENTALINK_API_URL = 'https://api.dentalink.healthatom.com/api/v1/sucursales';
-        const DENTALINK_API_KEY = 'uLDY8zgT9Oa10nDXSr8PPCou8MFT4BPNjwlYMcEX.c24YdKRkDONJW7nXcdQhx6VLEvsbxVFWia4FXmXh'; // Configura tu API key aquí
+        const DENTALINK_TOKEN = ''; // ⚠️ Coloca aquí tu token de Dentalink
 
         const headers = {
             'apikey': SUPABASE_KEY,
@@ -564,10 +564,10 @@
             }
         }
 
-        // SINCRONIZACIÓN CON DENTALINK
+        // 🔄 SINCRONIZACIÓN CON DENTALINK (HEADER CORREGIDO)
         async function sincronizarDentalink() {
-            if (!DENTALINK_API_KEY) {
-                mostrarToast('Configura la API Key de Dentalink en el código', 'error');
+            if (!DENTALINK_TOKEN) {
+                mostrarToast('⚠️ Configura el token de Dentalink en el código', 'error');
                 return;
             }
 
@@ -575,21 +575,23 @@
             icon.classList.add('fa-spin');
 
             try {
+                // FORMATO CORRECTO: Authorization: Token <token>
                 const response = await fetch(DENTALINK_API_URL, {
+                    method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${DENTALINK_API_KEY}`,
+                        'Authorization': `Token ${DENTALINK_TOKEN}`,
                         'Content-Type': 'application/json'
                     }
                 });
 
                 if (!response.ok) {
-                    throw new Error('Error en la API de Dentalink');
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
                 }
 
                 const resultado = await response.json();
 
-                // La respuesta es un array con un objeto que contiene "data"
-                const sucursalesDentalink = resultado[0]?.data || [];
+                // La respuesta tiene "data" directamente según la documentación
+                const sucursalesDentalink = resultado.data || [];
 
                 let nuevas = 0;
                 let actualizadas = 0;
@@ -621,6 +623,12 @@
                         });
                         nuevas++;
                     } else {
+                        // Actualizar datos existentes
+                        await fetch(`${SUPABASE_URL}/sucursales?id_sucursal=eq.${sucDental.id}`, {
+                            method: 'PATCH',
+                            headers,
+                            body: JSON.stringify(datos)
+                        });
                         actualizadas++;
                     }
                 }
@@ -628,7 +636,7 @@
                 await cargarDatos();
                 icon.classList.remove('fa-spin');
 
-                let mensaje = `Sync completado: ${nuevas} nuevas, ${actualizadas} existentes`;
+                let mensaje = `Sync completado: ${nuevas} nuevas, ${actualizadas} actualizadas`;
                 if (sinHorario > 0) {
                     mensaje += `. ⚠️ ${sinHorario} sucursal(es) sin horario`;
                     mostrarToast(mensaje, 'warning');
@@ -639,7 +647,7 @@
             } catch (error) {
                 console.error('Error en sync:', error);
                 icon.classList.remove('fa-spin');
-                mostrarToast('Error al sincronizar con Dentalink', 'error');
+                mostrarToast(`Error: ${error.message}`, 'error');
             }
         }
 
