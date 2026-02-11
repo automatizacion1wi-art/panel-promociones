@@ -103,7 +103,7 @@
                 </div>
 
                 <!-- Filtros -->
-                <div class="mb-4 flex gap-4">
+                <div class="mb-4 flex gap-4 flex-wrap">
                     <select id="filtroSucursal" onchange="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2">
                         <option value="">Todas las sucursales</option>
                     </select>
@@ -112,7 +112,7 @@
                         <option value="true">Activas</option>
                         <option value="false">Inactivas</option>
                     </select>
-                    <input type="text" id="buscarPromo" placeholder="Buscar promoción..." onkeyup="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2 flex-1">
+                    <input type="text" id="buscarPromo" placeholder="Buscar promoción..." onkeyup="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2 flex-1 min-w-[200px]">
                 </div>
 
                 <div class="overflow-x-auto">
@@ -205,9 +205,9 @@
     </div>
 
     <script>
-        // CONFIGURA TUS CREDENCIALES AQUÍ
-        const SUPABASE_URL = 'https://sdqmuabsdsghptbttwiy.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_M9qOYxTMgOKb9sOiLFZvZQ_MyiGwqjh';
+        // Credenciales configuradas
+        const SUPABASE_URL = 'https://sdqmuabsdsghptbttwiy.supabase.co/rest/v1';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkcW11YWJzZHNnaHB0YnR0d2l5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MTQ2NjMsImV4cCI6MjA4NTk5MDY2M30.Ki1AazQ5A7QcQuA0wUOjujGAGn1k749VRK2qoD7vNR0';
 
         const headers = {
             'apikey': SUPABASE_KEY,
@@ -219,6 +219,7 @@
         let promociones = [];
         let sucursales = [];
         let relaciones = [];
+        let promocionesFiltradas = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             cargarDatos();
@@ -246,8 +247,9 @@
         }
 
         async function cargarPromociones() {
-            const response = await fetch(`${SUPABASE_URL}/promociones?select=*`, { headers });
+            const response = await fetch(`${SUPABASE_URL}/promociones?select=*&order=id_promocion.desc`, { headers });
             promociones = await response.json();
+            promocionesFiltradas = [...promociones];
         }
 
         async function cargarRelaciones() {
@@ -271,35 +273,31 @@
 
         function renderizarTablaPromociones() {
             const tbody = document.getElementById('tablaPromociones');
-            if (promociones.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No hay promociones registradas</td></tr>';
+            if (promocionesFiltradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No hay promociones</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = promociones.map(promo => {
+            tbody.innerHTML = promocionesFiltradas.map(promo => {
                 const sucursalesAsignadas = relaciones.filter(r => r.id_promocion === promo.id_promocion);
-                const nombresSucursales = sucursalesAsignadas.map(r => {
-                    const suc = sucursales.find(s => s.id_sucursal === r.id_sucursal);
-                    return suc ? suc.nombre_sucursal : '';
-                }).filter(n => n).join(', ');
 
                 return `
                     <tr>
-                        <td class="px-6 py-4 text-sm text-gray-900">${promo.descripcion.substring(0, 80)}...</td>
-                        <td class="px-6 py-4 text-sm font-semibold text-green-600">$${promo.precio.toFixed(2)}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">${promo.descripcion.substring(0, 80)}${promo.descripcion.length > 80 ? '...' : ''}</td>
+                        <td class="px-6 py-4 text-sm font-semibold text-green-600">$${Number(promo.precio).toFixed(2)}</td>
                         <td class="px-6 py-4">
                             <span class="px-2 py-1 text-xs rounded-full ${promo.activa ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
                                 ${promo.activa ? 'Activa' : 'Inactiva'}
                             </span>
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-600">${sucursalesAsignadas.length} sucursales</td>
-                        <td class="px-6 py-4">
+                        <td class="px-6 py-4 flex gap-2">
                             <button onclick="toggleEstadoPromo(${promo.id_promocion}, ${promo.activa})" 
-                                    class="text-blue-600 hover:text-blue-800 mr-3">
+                                    class="text-blue-600 hover:text-blue-800" title="Cambiar estado">
                                 <i class="fas fa-toggle-${promo.activa ? 'on' : 'off'}"></i>
                             </button>
                             <button onclick="eliminarPromo(${promo.id_promocion})" 
-                                    class="text-red-600 hover:text-red-800">
+                                    class="text-red-600 hover:text-red-800" title="Eliminar">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
@@ -444,7 +442,33 @@
         }
 
         function filtrarPromociones() {
-            // Implementar filtrado (opcional)
+            const sucursalId = document.getElementById('filtroSucursal').value;
+            const estado = document.getElementById('filtroEstado').value;
+            const busqueda = document.getElementById('buscarPromo').value.toLowerCase();
+
+            promocionesFiltradas = promociones.filter(promo => {
+                // Filtro por sucursal
+                if (sucursalId) {
+                    const tieneRelacion = relaciones.some(r => 
+                        r.id_promocion === promo.id_promocion && 
+                        r.id_sucursal == sucursalId
+                    );
+                    if (!tieneRelacion) return false;
+                }
+
+                // Filtro por estado
+                if (estado !== '') {
+                    if (promo.activa.toString() !== estado) return false;
+                }
+
+                // Filtro por búsqueda
+                if (busqueda) {
+                    if (!promo.descripcion.toLowerCase().includes(busqueda)) return false;
+                }
+
+                return true;
+            });
+
             renderizarTablaPromociones();
         }
 
@@ -453,8 +477,16 @@
             const promosIds = relaciones.filter(r => r.id_sucursal === idSucursal).map(r => r.id_promocion);
             const promosSucursal = promociones.filter(p => promosIds.includes(p.id_promocion));
 
-            const lista = promosSucursal.map(p => `• ${p.descripcion} - $${p.precio}`).join('\n');
-            alert(`Promociones en ${suc.nombre_sucursal}:\n\n${lista}`);
+            if (promosSucursal.length === 0) {
+                alert(`${suc.nombre_sucursal} no tiene promociones asignadas`);
+                return;
+            }
+
+            const lista = promosSucursal.map((p, i) => 
+                `${i+1}. ${p.descripcion.substring(0, 60)}... - $${p.precio} ${p.activa ? '✅' : '❌'}`
+            ).join('\n\n');
+
+            alert(`📋 Promociones en ${suc.nombre_sucursal}:\n\n${lista}`);
         }
     </script>
 </body>
