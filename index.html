@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Promociones DX-RAY v4.0</title>
+    <title>Dashboard - Aranceles DX-RAY</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦷</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -36,16 +36,6 @@
             color: white;
         }
 
-        .toast-warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-        }
-
-        .toast-info {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-        }
-
         @keyframes slideIn {
             from { transform: translateX(400px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -59,77 +49,27 @@
         .toast.hiding {
             animation: slideOut 0.3s ease-out forwards;
         }
-
-        .badge-reportada {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 600;
-            margin-left: 8px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .sin-horario {
-            background: #fef3c7;
-            color: #92400e;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-
-        .stat-card {
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
     </style>
 </head>
 <body class="bg-gray-50">
     <div class="min-h-screen">
         <!-- Header -->
         <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
-            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-                <div>
-                    <h1 class="text-3xl font-bold">🦷 Dashboard DX-RAY</h1>
-                    <p class="text-blue-100">Gestión de Promociones y Sucursales v4.0</p>
-                </div>
-                <div class="flex gap-3">
-                    <button onclick="sincronizarDentalink()" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
-                        <i class="fas fa-sync" id="iconSync"></i>
-                        Sync Dentalink
-                    </button>
-                    <button onclick="recargarDatos()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
-                        <i class="fas fa-sync-alt" id="iconRecargar"></i>
-                        Recargar
-                    </button>
-                </div>
+            <div class="container mx-auto px-6 py-4">
+                <h1 class="text-3xl font-bold">🦷 Sistema de Aranceles - DX-RAY</h1>
+                <p class="text-blue-100">Gestión de Plataformas y Aranceles Dentalink</p>
             </div>
         </header>
 
-        <!-- Navegación por pestañas -->
+        <!-- Navegación -->
         <div class="bg-white shadow-md border-b">
             <div class="container mx-auto px-6">
                 <nav class="flex gap-8">
-                    <button onclick="cambiarSeccion('dashboard')" id="tab-dashboard" class="tab-active py-4 px-2 font-medium transition">
-                        <i class="fas fa-chart-line mr-2"></i>Dashboard
+                    <button onclick="cambiarSeccion('plataformas')" id="tab-plataformas" class="tab-active py-4 px-2 font-medium transition">
+                        <i class="fas fa-server mr-2"></i>Plataformas
                     </button>
-                    <button onclick="cambiarSeccion('promociones')" id="tab-promociones" class="py-4 px-2 font-medium text-gray-600 hover:text-blue-600 transition">
-                        <i class="fas fa-tags mr-2"></i>Promociones
-                    </button>
-                    <button onclick="cambiarSeccion('sucursales')" id="tab-sucursales" class="py-4 px-2 font-medium text-gray-600 hover:text-blue-600 transition">
-                        <i class="fas fa-building mr-2"></i>Sucursales
+                    <button onclick="cambiarSeccion('aranceles')" id="tab-aranceles" class="py-4 px-2 font-medium text-gray-600 hover:text-blue-600 transition">
+                        <i class="fas fa-list-alt mr-2"></i>Aranceles
                     </button>
                 </nav>
             </div>
@@ -137,187 +77,15 @@
 
         <div class="container mx-auto px-6 py-8">
 
-            <!-- SECCIÓN: DASHBOARD -->
-            <div id="section-dashboard">
-                <!-- Stats Cards (CLICKEABLES) -->
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-                    <div onclick="irAPromocionesConFiltro('')" class="stat-card bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-500 text-sm font-medium">Total Promociones</p>
-                                <p class="text-3xl font-bold text-gray-800" id="totalPromos">0</p>
-                            </div>
-                            <div class="bg-blue-100 rounded-full p-3">
-                                <i class="fas fa-tags text-blue-600 text-2xl"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div onclick="irAPromocionesConFiltro('Activa')" class="stat-card bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-500 text-sm font-medium">Activas</p>
-                                <p class="text-3xl font-bold text-gray-800" id="promosActivas">0</p>
-                            </div>
-                            <div class="bg-green-100 rounded-full p-3">
-                                <i class="fas fa-check-circle text-green-600 text-2xl"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div onclick="irAPromocionesConFiltro('En proceso')" class="stat-card bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-500 text-sm font-medium">En Proceso</p>
-                                <p class="text-3xl font-bold text-gray-800" id="promosEnProceso">0</p>
-                            </div>
-                            <div class="bg-yellow-100 rounded-full p-3">
-                                <i class="fas fa-hourglass-half text-yellow-600 text-2xl"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div onclick="irAPromocionesConFiltro('Reportada')" class="stat-card bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-500 text-sm font-medium">Reportadas</p>
-                                <p class="text-3xl font-bold text-gray-800" id="promosReportadas">0</p>
-                            </div>
-                            <div class="bg-red-100 rounded-full p-3">
-                                <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div onclick="irAPromocionesConFiltro('Inactiva')" class="stat-card bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-500 text-sm font-medium">Inactivas</p>
-                                <p class="text-3xl font-bold text-gray-800" id="promosInactivas">0</p>
-                            </div>
-                            <div class="bg-purple-100 rounded-full p-3">
-                                <i class="fas fa-ban text-purple-600 text-2xl"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Promociones por Sucursal -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">📊 Promociones por Sucursal</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursal</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ciudad</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Activas</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">En Proceso</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tablaSucursalesPromos" class="bg-white divide-y divide-gray-200">
-                                <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECCIÓN: PROMOCIONES -->
-            <div id="section-promociones" class="section-hidden">
+            <!-- SECCIÓN: PLATAFORMAS -->
+            <div id="section-plataformas">
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-bold text-gray-800">📋 Gestión de Promociones</h3>
-                        <div class="flex gap-3">
-                            <button onclick="mostrarConfirmacionAprobarTodas()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
-                                <i class="fas fa-check-double"></i>
-                                Aprobar Todas
-                            </button>
-                            <button onclick="mostrarFormNuevaPromocion()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
-                                <i class="fas fa-plus"></i>
-                                Nueva Promoción
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Filtros -->
-                    <div class="mb-4 flex gap-4 flex-wrap">
-                        <select id="filtroSucursal" onchange="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2">
-                            <option value="">Todas las sucursales</option>
-                        </select>
-                        <select id="filtroEstado" onchange="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2">
-                            <option value="">Todos los estados</option>
-                            <option value="Activa">Activas</option>
-                            <option value="En proceso">En proceso</option>
-                            <option value="Inactiva">Inactivas</option>
-                            <option value="Reportada">Reportadas</option>
-                        </select>
-                        <select id="filtroTipo" onchange="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2">
-                            <option value="">Todos los tipos</option>
-                            <option value="Integrales">Integrales</option>
-                            <option value="Ortodoncia">Ortodoncia</option>
-                        </select>
-                        <input type="text" id="buscarPromo" placeholder="Buscar promoción..." onkeyup="filtrarPromociones()" class="border border-gray-300 rounded-lg px-4 py-2 flex-1 min-w-[200px]">
-                    </div>
-
-                    <!-- Selector de items por página -->
-                    <div class="mb-4 flex items-center gap-2">
-                        <label class="text-sm text-gray-600">Mostrar:</label>
-                        <select id="itemsPorPagina" onchange="cambiarItemsPorPagina()" class="border border-gray-300 rounded px-3 py-1 text-sm">
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                        <span class="text-sm text-gray-600">registros</span>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
-                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
-                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Precio</th>
-                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mensualidad</th>
-                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Medio</th>
-                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estatus</th>
-                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vigencia</th>
-                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursales</th>
-                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tablaPromociones" class="bg-white divide-y divide-gray-200">
-                                <tr><td colspan="9" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Paginación -->
-                    <div class="mt-4 flex justify-between items-center">
-                        <div class="text-sm text-gray-600" id="infoPromos"></div>
-                        <div class="flex gap-2" id="paginacionPromos"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECCIÓN: SUCURSALES -->
-            <div id="section-sucursales" class="section-hidden">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-bold text-gray-800">🏥 Gestión de Sucursales</h3>
-                        <button onclick="sincronizarDentalink()" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
-                            <i class="fas fa-sync"></i>
-                            Sync Dentalink
+                        <h3 class="text-xl font-bold text-gray-800">🌐 Plataformas / Tokens</h3>
+                        <button onclick="mostrarFormNuevaPlataforma()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                            <i class="fas fa-plus"></i>
+                            Nueva Plataforma
                         </button>
-                    </div>
-
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
-                        <p class="text-sm text-blue-800">
-                            <i class="fas fa-info-circle mr-2"></i>
-                            <strong>Nota:</strong> Solo puedes editar los horarios de las sucursales. Los demás datos se actualizan desde Dentalink.
-                        </p>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -325,133 +93,82 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ciudad</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teléfono</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Horarios</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Zona</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Token</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Promociones</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aranceles</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="tablaSucursales" class="bg-white divide-y divide-gray-200">
-                                <tr><td colspan="8" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
+                            <tbody id="tablaPlataformas" class="bg-white divide-y divide-gray-200">
+                                <tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+            <!-- SECCIÓN: ARANCELES -->
+            <div id="section-aranceles" class="section-hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">📋 Aranceles</h3>
+                        <button onclick="sincronizarAranceles()" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                            <i class="fas fa-sync" id="iconSyncAranceles"></i>
+                            Sincronizar Aranceles
+                        </button>
+                    </div>
+
+                    <!-- Filtro por plataforma -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Filtrar por Plataforma:</label>
+                        <select id="filtroPlataforma" onchange="cargarAranceles()" class="border border-gray-300 rounded-lg px-4 py-2 w-full max-w-md">
+                            <option value="">Selecciona una plataforma...</option>
+                        </select>
+                    </div>
+
+                    <div id="contenedorAranceles">
+                        <p class="text-gray-500 text-center py-8">Selecciona una plataforma para ver sus aranceles</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- Modal Nueva/Editar Promoción -->
-    <div id="modalPromocion" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <!-- Modal Nueva/Editar Plataforma -->
+    <div id="modalPlataforma" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-lg w-full mx-4">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-gray-800" id="tituloModalPromo">➕ Nueva Promoción</h3>
-                <button onclick="cerrarModalPromocion()" class="text-gray-500 hover:text-gray-700">
+                <h3 class="text-2xl font-bold text-gray-800" id="tituloModalPlataforma">➕ Nueva Plataforma</h3>
+                <button onclick="cerrarModalPlataforma()" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times text-2xl"></i>
                 </button>
             </div>
-            <form id="formPromocion" onsubmit="guardarPromocion(event)">
-                <input type="hidden" id="idPromocionEditar">
+            <form id="formPlataforma" onsubmit="guardarPlataforma(event)">
+                <input type="hidden" id="idPlataformaEditar">
                 <div class="space-y-4">
-                    <!-- Tipo de Promoción y Precio -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Promoción</label>
-                            <select id="tipoPromocion" onchange="toggleMensualidad()" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
-                                <option value="Integrales">Integrales</option>
-                                <option value="Ortodoncia">Ortodoncia</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Precio</label>
-                            <input type="number" id="precio" step="0.01" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
-                        </div>
-                    </div>
-
-                    <!-- Mensualidad (solo para Ortodoncia) -->
-                    <div id="campoMensualidad" style="display:none;">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            💳 Mensualidad 
-                            <span class="text-xs text-gray-500">(solo para Ortodoncia)</span>
-                        </label>
-                        <input type="number" id="mensualidad" step="0.01" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
-                    </div>
-
-                    <!-- Campo Medio -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            📢 Medio de Difusión
-                        </label>
-                        <select id="medio" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
-                            <option value="">Seleccionar medio...</option>
-                            <option value="WhatsApp">WhatsApp</option>
-                            <option value="Facebook">Facebook</option>
-                            <option value="Instagram">Instagram</option>
-                            <option value="Email">Email</option>
-                            <option value="Sitio Web">Sitio Web</option>
-                            <option value="Presencial">Presencial</option>
-                            <option value="Volante">Volante</option>
-                            <option value="Otro">Otro</option>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Zona / Región</label>
+                        <input type="text" id="zonaPlataforma" required placeholder="Ej: Tuxtla Gutiérrez" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Token de Dentalink</label>
+                        <textarea id="tokenPlataforma" required placeholder="Pega aquí el token de la API de Dentalink" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                        <select id="activaPlataforma" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="true">Activa</option>
+                            <option value="false">Inactiva</option>
                         </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
-                        <textarea id="descripcion" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Términos y Condiciones</label>
-                        <textarea id="terminosCondiciones" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Términos y condiciones de la promoción..."></textarea>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-calendar-alt text-blue-600"></i> Fecha Inicio
-                            </label>
-                            <input type="date" id="fechaInicio" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-calendar-check text-red-600"></i> Fecha Fin
-                            </label>
-                            <input type="date" id="fechaFin" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Estatus</label>
-                        <select id="estatus" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
-                            <option value="En proceso">En proceso</option>
-                            <option value="Activa">Activa</option>
-                            <option value="Inactiva">Inactiva</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Asignar a Sucursales</label>
-                        <div class="flex gap-2 mb-2">
-                            <button type="button" onclick="seleccionarTodasSucursales()" class="text-sm text-blue-600 hover:text-blue-800">
-                                <i class="fas fa-check-square"></i> Seleccionar todas
-                            </button>
-                            <button type="button" onclick="deseleccionarTodasSucursales()" class="text-sm text-gray-600 hover:text-gray-800">
-                                <i class="fas fa-square"></i> Deseleccionar todas
-                            </button>
-                        </div>
-                        <div id="checkboxesSucursales" class="space-y-2 max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
-                        </div>
                     </div>
                 </div>
                 <div class="flex gap-4 mt-6">
                     <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition">
                         <i class="fas fa-save"></i> Guardar
                     </button>
-                    <button type="button" onclick="cerrarModalPromocion()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium transition">
+                    <button type="button" onclick="cerrarModalPlataforma()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium transition">
                         <i class="fas fa-times"></i> Cancelar
                     </button>
                 </div>
@@ -459,79 +176,17 @@
         </div>
     </div>
 
-    <!-- Modal Editar Horario Sucursal -->
-    <div id="modalSucursal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-lg w-full mx-4">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-gray-800">🕒 Editar Horarios</h3>
-                <button onclick="cerrarModalSucursal()" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-2xl"></i>
-                </button>
-            </div>
-            <form id="formSucursal" onsubmit="guardarHorarioSucursal(event)">
-                <input type="hidden" id="idSucursalEditar">
-                <div class="space-y-4">
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-1">Sucursal:</p>
-                        <p class="text-lg font-bold text-gray-800" id="nombreSucursalModal"></p>
-                        <p class="text-sm text-gray-500" id="ciudadSucursalModal"></p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Horarios
-                            <span class="text-xs text-gray-500 ml-2">(Ej: Lunes a Viernes 10:00 - 19:00)</span>
-                        </label>
-                        <input type="text" id="horariosSucursal" placeholder="Escribe el horario..." class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
-                    </div>
-                </div>
-                <div class="flex gap-4 mt-6">
-                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition">
-                        <i class="fas fa-save"></i> Guardar Horario
-                    </button>
-                    <button type="button" onclick="cerrarModalSucursal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium transition">
-                        <i class="fas fa-times"></i> Cancelar
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Ver Sucursales de Promoción -->
-    <div id="modalVerSucursales" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <!-- Modal Ver Sucursales de Arancel -->
+    <div id="modalVerSucursalesArancel" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
         <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-gray-800">🏢 Sucursales de la Promoción</h3>
-                <button onclick="cerrarModalVerSucursales()" class="text-gray-500 hover:text-gray-700">
+                <h3 class="text-2xl font-bold text-gray-800">🏢 Sucursales del Arancel</h3>
+                <button onclick="cerrarModalVerSucursalesArancel()" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times text-2xl"></i>
                 </button>
             </div>
-            <div id="listaSucursalesPromo" class="space-y-2">
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Confirmación Aprobar Todas -->
-    <div id="modalConfirmarAprobar" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-3xl w-full mx-4 max-h-[80vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-gray-800">✅ Confirmar Aprobación Masiva</h3>
-                <button onclick="cerrarModalConfirmarAprobar()" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-2xl"></i>
-                </button>
-            </div>
-            <div class="mb-4">
-                <p class="text-gray-700 mb-4">Se aprobarán las siguientes promociones:</p>
-                <div id="listaPromosAprobar" class="space-y-2 max-h-96 overflow-y-auto">
-                </div>
-            </div>
-            <div class="flex gap-4 mt-6">
-                <button onclick="aprobarTodasConfirmado()" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition">
-                    <i class="fas fa-check-double"></i> Confirmar y Aprobar Todas
-                </button>
-                <button onclick="cerrarModalConfirmarAprobar()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium transition">
-                    <i class="fas fa-times"></i> Cancelar
-                </button>
-            </div>
+            <div id="infoArancel" class="bg-blue-50 p-4 rounded-lg mb-4"></div>
+            <div id="listaSucursalesArancel" class="space-y-2"></div>
         </div>
     </div>
 
@@ -539,8 +194,7 @@
         const SUPABASE_URL = 'https://sdqmuabsdsghptbttwiy.supabase.co/rest/v1';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkcW11YWJzZHNnaHB0YnR0d2l5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MTQ2NjMsImV4cCI6MjA4NTk5MDY2M30.Ki1AazQ5A7QcQuA0wUOjujGAGn1k749VRK2qoD7vNR0';
 
-        const DENTALINK_API_URL = 'https://api.dentalink.healthatom.com/api/v1/sucursales';
-        const DENTALINK_TOKEN = ''; // ⚠️ Coloca aquí tu token
+        const DENTALINK_API_ARANCELES = 'https://api.dentalink.healthatom.com/api/v1/aranceles';
 
         const headers = {
             'apikey': SUPABASE_KEY,
@@ -549,75 +203,15 @@
             'Prefer': 'return=representation'
         };
 
-        let promociones = [];
+        let plataformas = [];
+        let aranceles = [];
         let sucursales = [];
-        let relaciones = [];
-        let promocionesFiltradas = [];
-        let paginaActual = 1;
-        let itemsPorPagina = 10;
+        let arancelSucursal = [];
 
         document.addEventListener('DOMContentLoaded', () => {
-            cargarDatos();
-            setInterval(verificarPromocionesVencidas, 60000);
+            cargarPlataformas();
+            cargarSucursales();
         });
-
-        // FUNCIÓN PARA IR A PROMOCIONES CON FILTRO DESDE DASHBOARD
-        function irAPromocionesConFiltro(estatus) {
-            cambiarSeccion('promociones');
-
-            setTimeout(() => {
-                document.getElementById('filtroEstado').value = estatus;
-                filtrarPromociones();
-            }, 100);
-        }
-
-        // FUNCIÓN PARA OBTENER FECHAS DEL SIGUIENTE MES
-        function obtenerFechasSiguienteMes() {
-            const hoy = new Date();
-            const primerDiaSiguiente = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 1);
-            const ultimoDiaSiguiente = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0);
-
-            const formatear = (fecha) => {
-                const year = fecha.getFullYear();
-                const month = String(fecha.getMonth() + 1).padStart(2, '0');
-                const day = String(fecha.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            };
-
-            return {
-                inicio: formatear(primerDiaSiguiente),
-                fin: formatear(ultimoDiaSiguiente)
-            };
-        }
-
-        function toggleMensualidad() {
-            const tipo = document.getElementById('tipoPromocion').value;
-            const campoMensualidad = document.getElementById('campoMensualidad');
-            const inputMensualidad = document.getElementById('mensualidad');
-
-            if (tipo === 'Ortodoncia') {
-                campoMensualidad.style.display = 'block';
-                inputMensualidad.required = true;
-            } else {
-                campoMensualidad.style.display = 'none';
-                inputMensualidad.required = false;
-                inputMensualidad.value = '';
-            }
-        }
-
-        function getMedioIcon(medio) {
-            const iconos = {
-                'WhatsApp': '💬',
-                'Facebook': '📘',
-                'Instagram': '📸',
-                'Email': '📧',
-                'Sitio Web': '🌐',
-                'Presencial': '🏢',
-                'Volante': '📄',
-                'Otro': '📢'
-            };
-            return iconos[medio] || '📢';
-        }
 
         function mostrarToast(mensaje, tipo = 'success') {
             const toast = document.createElement('div');
@@ -625,9 +219,7 @@
 
             const iconos = {
                 success: '<i class="fas fa-check-circle text-2xl"></i>',
-                error: '<i class="fas fa-exclamation-circle text-2xl"></i>',
-                warning: '<i class="fas fa-exclamation-triangle text-2xl"></i>',
-                info: '<i class="fas fa-info-circle text-2xl"></i>'
+                error: '<i class="fas fa-exclamation-circle text-2xl"></i>'
             };
 
             toast.innerHTML = `${iconos[tipo]}<span class="font-medium">${mensaje}</span>`;
@@ -639,113 +231,231 @@
             }, 3000);
         }
 
-        async function recargarDatos() {
-            const icon = document.getElementById('iconRecargar');
-            icon.classList.add('fa-spin');
-            await cargarDatos();
-            setTimeout(() => {
-                icon.classList.remove('fa-spin');
-                mostrarToast('Datos actualizados correctamente', 'success');
-            }, 500);
+        function cambiarSeccion(seccion) {
+            ['plataformas', 'aranceles'].forEach(s => {
+                document.getElementById(`section-${s}`).classList.add('section-hidden');
+                document.getElementById(`tab-${s}`).classList.remove('tab-active');
+                document.getElementById(`tab-${s}`).classList.add('text-gray-600');
+            });
+
+            document.getElementById(`section-${seccion}`).classList.remove('section-hidden');
+            document.getElementById(`tab-${seccion}`).classList.add('tab-active');
+            document.getElementById(`tab-${seccion}`).classList.remove('text-gray-600');
         }
 
-        async function cargarDatos() {
+        async function cargarPlataformas() {
             try {
-                await Promise.all([
-                    cargarSucursales(),
-                    cargarPromociones(),
-                    cargarRelaciones()
-                ]);
-                actualizarUI();
+                const response = await fetch(`${SUPABASE_URL}/plataformas?select=*&order=id_plataforma.asc`, { headers });
+                plataformas = await response.json();
+                renderizarTablaPlataformas();
+                llenarSelectPlataformas();
             } catch (error) {
-                console.error('Error cargando datos:', error);
-                mostrarToast('Error al cargar los datos', 'error');
+                console.error('Error cargando plataformas:', error);
+                mostrarToast('Error al cargar plataformas', 'error');
             }
         }
 
         async function cargarSucursales() {
-            const response = await fetch(`${SUPABASE_URL}/sucursales?select=*&order=id_sucursal.asc`, { headers });
-            sucursales = await response.json();
-            llenarSelectSucursales();
-        }
-
-        async function cargarPromociones() {
-            const response = await fetch(`${SUPABASE_URL}/promociones?select=*`, { headers });
-            promociones = await response.json();
-
-            // ORDENAMIENTO PERSONALIZADO
-            promociones.sort((a, b) => {
-                // Prioridad de estatus
-                const prioridadEstatus = {
-                    'Reportada': 1,
-                    'En proceso': 2,
-                    'Activa': 3,
-                    'Inactiva': 4
-                };
-
-                const prioA = prioridadEstatus[a.estatus] || 99;
-                const prioB = prioridadEstatus[b.estatus] || 99;
-
-                if (prioA !== prioB) {
-                    return prioA - prioB;
-                }
-
-                // Si son Activas, ordenar por fecha de creación (más reciente primero)
-                if (a.estatus === 'Activa' && b.estatus === 'Activa') {
-                    return new Date(b.created_at) - new Date(a.created_at);
-                }
-
-                // Para otros casos, mantener orden por fecha de creación descendente
-                return new Date(b.created_at) - new Date(a.created_at);
-            });
-
-            aplicarFiltrosActuales();
-        }
-
-        async function cargarRelaciones() {
-            const response = await fetch(`${SUPABASE_URL}/sucursal_promocion?select=*`, { headers });
-            relaciones = await response.json();
-        }
-
-        async function verificarPromocionesVencidas() {
-            const hoy = new Date().toISOString().split('T')[0];
-            let desactivadas = 0;
-
-            for (const promo of promociones) {
-                if (promo.estatus === 'Activa' && promo.fecha_fin && promo.fecha_fin < hoy) {
-                    try {
-                        await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${promo.id_promocion}`, {
-                            method: 'PATCH',
-                            headers,
-                            body: JSON.stringify({ estatus: 'Inactiva' })
-                        });
-                        desactivadas++;
-                    } catch (error) {
-                        console.error('Error desactivando promoción vencida:', error);
-                    }
-                }
-            }
-
-            if (desactivadas > 0) {
-                await cargarDatos();
-                mostrarToast(`${desactivadas} promoción(es) vencida(s) desactivada(s)`, 'warning');
+            try {
+                const response = await fetch(`${SUPABASE_URL}/sucursales?select=*&order=id_sucursal.asc`, { headers });
+                sucursales = await response.json();
+            } catch (error) {
+                console.error('Error cargando sucursales:', error);
             }
         }
 
-        async function sincronizarDentalink() {
-            if (!DENTALINK_TOKEN) {
-                mostrarToast('⚠️ Configura el token de Dentalink en el código', 'error');
+        function renderizarTablaPlataformas() {
+            const tbody = document.getElementById('tablaPlataformas');
+
+            if (plataformas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay plataformas configuradas</td></tr>';
                 return;
             }
 
-            const icon = document.getElementById('iconSync');
+            tbody.innerHTML = plataformas.map(plat => {
+                const tokenCorto = plat.token.substring(0, 20) + '...';
+                const cantAranceles = aranceles.filter(a => a.id_plataforma === plat.id_plataforma).length;
+
+                return `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 text-sm font-bold text-blue-600">${plat.id_plataforma}</td>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">${plat.zona}</td>
+                    <td class="px-6 py-4 text-xs text-gray-500 font-mono">${tokenCorto}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs rounded-full ${plat.activa ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                            ${plat.activa ? '✓ Activa' : '✗ Inactiva'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm font-semibold text-blue-600">${cantAranceles}</td>
+                    <td class="px-6 py-4 flex gap-2">
+                        <button onclick="editarPlataforma(${plat.id_plataforma})" 
+                                class="text-blue-600 hover:text-blue-800" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="eliminarPlataforma(${plat.id_plataforma})" 
+                                class="text-red-600 hover:text-red-800" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            }).join('');
+        }
+
+        function llenarSelectPlataformas() {
+            const select = document.getElementById('filtroPlataforma');
+            const plataformasActivas = plataformas.filter(p => p.activa);
+
+            select.innerHTML = '<option value="">Selecciona una plataforma...</option>' +
+                plataformasActivas.map(p => `<option value="${p.id_plataforma}">${p.zona}</option>`).join('');
+        }
+
+        async function cargarAranceles() {
+            const idPlataforma = document.getElementById('filtroPlataforma').value;
+
+            if (!idPlataforma) {
+                document.getElementById('contenedorAranceles').innerHTML = 
+                    '<p class="text-gray-500 text-center py-8">Selecciona una plataforma para ver sus aranceles</p>';
+                return;
+            }
+
+            try {
+                // Cargar aranceles de Supabase
+                const responseAranceles = await fetch(
+                    `${SUPABASE_URL}/aranceles?id_plataforma=eq.${idPlataforma}&select=*&order=id_arancel.asc`, 
+                    { headers }
+                );
+                aranceles = await responseAranceles.json();
+
+                // Cargar relaciones arancel-sucursal
+                const responseRelaciones = await fetch(
+                    `${SUPABASE_URL}/arancel_sucursal?select=*`, 
+                    { headers }
+                );
+                arancelSucursal = await responseRelaciones.json();
+
+                renderizarAranceles();
+            } catch (error) {
+                console.error('Error cargando aranceles:', error);
+                mostrarToast('Error al cargar aranceles', 'error');
+            }
+        }
+
+        function renderizarAranceles() {
+            const contenedor = document.getElementById('contenedorAranceles');
+
+            if (aranceles.length === 0) {
+                contenedor.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-gray-500 mb-4">No hay aranceles sincronizados para esta plataforma</p>
+                        <button onclick="sincronizarAranceles()" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-sync mr-2"></i>Sincronizar Aranceles
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            contenedor.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    ${aranceles.map(arancel => {
+                        const sucursalesArancel = arancelSucursal
+                            .filter(as => as.id_arancel === arancel.id_arancel)
+                            .map(as => sucursales.find(s => s.id_sucursal === as.id_sucursal))
+                            .filter(s => s);
+
+                        return `
+                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-gray-800 text-lg">${arancel.nombre_arancel}</h4>
+                                    <p class="text-xs text-gray-500">ID: ${arancel.id_arancel}</p>
+                                </div>
+                                <span class="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-800 font-semibold">
+                                    ${sucursalesArancel.length} sucursal${sucursalesArancel.length !== 1 ? 'es' : ''}
+                                </span>
+                            </div>
+
+                            ${arancel.descripcion ? `<p class="text-sm text-gray-600 mb-3">${arancel.descripcion}</p>` : ''}
+
+                            <div class="space-y-1 mb-3">
+                                ${sucursalesArancel.slice(0, 3).map(s => `
+                                    <div class="text-xs text-gray-700 flex items-center gap-2">
+                                        <i class="fas fa-building text-blue-500"></i>
+                                        <span>${s.nombre_sucursal}</span>
+                                    </div>
+                                `).join('')}
+                                ${sucursalesArancel.length > 3 ? `
+                                    <div class="text-xs text-gray-500 italic">
+                                        + ${sucursalesArancel.length - 3} más...
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            <button onclick="verSucursalesArancel(${arancel.id_arancel})" 
+                                    class="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 py-2 rounded-lg text-sm font-medium transition">
+                                <i class="fas fa-eye mr-2"></i>Ver todas las sucursales
+                            </button>
+                        </div>
+                    `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function verSucursalesArancel(idArancel) {
+            const arancel = aranceles.find(a => a.id_arancel === idArancel);
+            const sucursalesArancel = arancelSucursal
+                .filter(as => as.id_arancel === idArancel)
+                .map(as => sucursales.find(s => s.id_sucursal === as.id_sucursal))
+                .filter(s => s);
+
+            document.getElementById('infoArancel').innerHTML = `
+                <h4 class="font-bold text-gray-800 text-lg">${arancel.nombre_arancel}</h4>
+                <p class="text-sm text-gray-600">ID Arancel: ${arancel.id_arancel}</p>
+                <p class="text-sm text-gray-600">${sucursalesArancel.length} sucursal${sucursalesArancel.length !== 1 ? 'es' : ''} asignada${sucursalesArancel.length !== 1 ? 's' : ''}</p>
+            `;
+
+            document.getElementById('listaSucursalesArancel').innerHTML = sucursalesArancel.map(s => `
+                <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-semibold text-gray-800">${s.nombre_sucursal}</p>
+                            <p class="text-sm text-gray-600">${s.ciudad || '-'}</p>
+                            <p class="text-xs text-gray-500">${s.telefono || 'Sin teléfono'}</p>
+                        </div>
+                        <span class="px-3 py-1 text-xs rounded-full ${s.activa !== false ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                            ${s.activa !== false ? '✓ Activa' : '✗ Inactiva'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('modalVerSucursalesArancel').classList.remove('hidden');
+        }
+
+        function cerrarModalVerSucursalesArancel() {
+            document.getElementById('modalVerSucursalesArancel').classList.add('hidden');
+        }
+
+        async function sincronizarAranceles() {
+            const idPlataforma = document.getElementById('filtroPlataforma').value;
+
+            if (!idPlataforma) {
+                mostrarToast('Selecciona una plataforma primero', 'error');
+                return;
+            }
+
+            const plataforma = plataformas.find(p => p.id_plataforma == idPlataforma);
+            const icon = document.getElementById('iconSyncAranceles');
             icon.classList.add('fa-spin');
 
             try {
-                const response = await fetch(DENTALINK_API_URL, {
+                // 1. Obtener aranceles de Dentalink
+                const response = await fetch(DENTALINK_API_ARANCELES, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Token ${DENTALINK_TOKEN}`,
+                        'Authorization': `Token ${plataforma.token}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -755,52 +465,65 @@
                 }
 
                 const resultado = await response.json();
-                const sucursalesDentalink = resultado.data || [];
+                const arancelesDentalink = resultado.data || [];
 
-                let nuevas = 0;
-                let actualizadas = 0;
+                let nuevos = 0;
+                let actualizados = 0;
 
-                for (const sucDental of sucursalesDentalink) {
-                    const existe = sucursales.find(s => s.id_sucursal === sucDental.id);
+                for (const arancelDental of arancelesDentalink) {
+                    const existe = aranceles.find(a => a.id_arancel === arancelDental.id);
+
+                    const datosArancel = {
+                        id_arancel: arancelDental.id,
+                        id_plataforma: parseInt(idPlataforma),
+                        nombre_arancel: arancelDental.nombre,
+                        descripcion: arancelDental.descripcion || null
+                    };
 
                     if (!existe) {
-                        const datos = {
-                            id_sucursal: sucDental.id,
-                            nombre_sucursal: sucDental.nombre,
-                            ciudad: sucDental.ciudad || sucDental.comuna || 'Sin ciudad',
-                            direccion: sucDental.direccion,
-                            telefono: sucDental.telefono,
-                            horarios: null,
-                            activa: sucDental.habilitada === 1
-                        };
-
-                        await fetch(`${SUPABASE_URL}/sucursales`, {
+                        await fetch(`${SUPABASE_URL}/aranceles`, {
                             method: 'POST',
                             headers,
-                            body: JSON.stringify(datos)
+                            body: JSON.stringify(datosArancel)
                         });
-                        nuevas++;
+                        nuevos++;
                     } else {
-                        const datosActualizar = {
-                            nombre_sucursal: sucDental.nombre,
-                            ciudad: sucDental.ciudad || sucDental.comuna || 'Sin ciudad',
-                            direccion: sucDental.direccion,
-                            telefono: sucDental.telefono,
-                            activa: sucDental.habilitada === 1
-                        };
-
-                        await fetch(`${SUPABASE_URL}/sucursales?id_sucursal=eq.${sucDental.id}`, {
+                        await fetch(`${SUPABASE_URL}/aranceles?id_arancel=eq.${arancelDental.id}`, {
                             method: 'PATCH',
                             headers,
-                            body: JSON.stringify(datosActualizar)
+                            body: JSON.stringify(datosArancel)
                         });
-                        actualizadas++;
+                        actualizados++;
+                    }
+
+                    // 2. Sincronizar relaciones arancel-sucursal
+                    if (arancelDental.sucursales && Array.isArray(arancelDental.sucursales)) {
+                        // Eliminar relaciones existentes
+                        await fetch(`${SUPABASE_URL}/arancel_sucursal?id_arancel=eq.${arancelDental.id}`, {
+                            method: 'DELETE',
+                            headers
+                        });
+
+                        // Crear nuevas relaciones
+                        for (const idSucursal of arancelDental.sucursales) {
+                            const sucursalExiste = sucursales.find(s => s.id_sucursal === idSucursal);
+                            if (sucursalExiste) {
+                                await fetch(`${SUPABASE_URL}/arancel_sucursal`, {
+                                    method: 'POST',
+                                    headers,
+                                    body: JSON.stringify({
+                                        id_arancel: arancelDental.id,
+                                        id_sucursal: idSucursal
+                                    })
+                                });
+                            }
+                        }
                     }
                 }
 
-                await cargarDatos();
+                await cargarAranceles();
                 icon.classList.remove('fa-spin');
-                mostrarToast(`Sync completado: ${nuevas} nuevas, ${actualizadas} actualizadas`, 'success');
+                mostrarToast(`Sync completado: ${nuevos} nuevos, ${actualizados} actualizados`, 'success');
 
             } catch (error) {
                 console.error('Error en sync:', error);
@@ -809,605 +532,82 @@
             }
         }
 
-        function aplicarFiltrosActuales() {
-            const sucursalId = document.getElementById('filtroSucursal')?.value || '';
-            const estado = document.getElementById('filtroEstado')?.value || '';
-            const tipo = document.getElementById('filtroTipo')?.value || '';
-            const busqueda = document.getElementById('buscarPromo')?.value.toLowerCase() || '';
+        // FUNCIONES DE PLATAFORMAS
 
-            promocionesFiltradas = promociones.filter(promo => {
-                if (sucursalId) {
-                    const tieneRelacion = relaciones.some(r => 
-                        r.id_promocion === promo.id_promocion && 
-                        r.id_sucursal == sucursalId
-                    );
-                    if (!tieneRelacion) return false;
-                }
-
-                if (estado && promo.estatus !== estado) return false;
-                if (tipo && promo.tipo_promocion !== tipo) return false;
-                if (busqueda && !promo.descripcion.toLowerCase().includes(busqueda)) return false;
-
-                return true;
-            });
+        function mostrarFormNuevaPlataforma() {
+            document.getElementById('tituloModalPlataforma').textContent = '➕ Nueva Plataforma';
+            document.getElementById('idPlataformaEditar').value = '';
+            document.getElementById('formPlataforma').reset();
+            document.getElementById('modalPlataforma').classList.remove('hidden');
         }
 
-        function actualizarUI() {
-            actualizarStats();
-            renderizarTablaPromociones();
-            renderizarTablaSucursales();
-            renderizarPromosPorSucursal();
+        function cerrarModalPlataforma() {
+            document.getElementById('modalPlataforma').classList.add('hidden');
+            document.getElementById('formPlataforma').reset();
         }
 
-        function actualizarStats() {
-            document.getElementById('totalPromos').textContent = promociones.length;
-            document.getElementById('promosActivas').textContent = promociones.filter(p => p.estatus === 'Activa').length;
-            document.getElementById('promosEnProceso').textContent = promociones.filter(p => p.estatus === 'En proceso').length;
-            document.getElementById('promosReportadas').textContent = promociones.filter(p => p.estatus === 'Reportada').length;
-            document.getElementById('promosInactivas').textContent = promociones.filter(p => p.estatus === 'Inactiva').length;
+        function editarPlataforma(idPlataforma) {
+            const plat = plataformas.find(p => p.id_plataforma === idPlataforma);
+            if (!plat) return;
+
+            document.getElementById('tituloModalPlataforma').textContent = '✏️ Editar Plataforma';
+            document.getElementById('idPlataformaEditar').value = plat.id_plataforma;
+            document.getElementById('zonaPlataforma').value = plat.zona;
+            document.getElementById('tokenPlataforma').value = plat.token;
+            document.getElementById('activaPlataforma').value = plat.activa.toString();
+
+            document.getElementById('modalPlataforma').classList.remove('hidden');
         }
 
-        function cambiarSeccion(seccion) {
-            ['dashboard', 'promociones', 'sucursales'].forEach(s => {
-                document.getElementById(`section-${s}`).classList.add('section-hidden');
-                document.getElementById(`tab-${s}`).classList.remove('tab-active');
-                document.getElementById(`tab-${s}`).classList.add('text-gray-600');
-            });
-
-            document.getElementById(`section-${seccion}`).classList.remove('section-hidden');
-            document.getElementById(`tab-${seccion}`).classList.add('tab-active');
-            document.getElementById(`tab-${seccion}`).classList.remove('text-gray-600');
-
-            if (seccion !== 'promociones') {
-                cargarDatos();
-            }
-        }
-
-        function cambiarItemsPorPagina() {
-            itemsPorPagina = parseInt(document.getElementById('itemsPorPagina').value);
-            paginaActual = 1;
-            renderizarTablaPromociones();
-        }
-
-        function formatearFecha(fecha) {
-            if (!fecha) return '-';
-            const [year, month, day] = fecha.split('-');
-            return `${day}/${month}/${year}`;
-        }
-
-        function getEstatusBadge(estatus) {
-            const badges = {
-                'Activa': 'bg-green-100 text-green-800',
-                'Inactiva': 'bg-gray-100 text-gray-800',
-                'En proceso': 'bg-yellow-100 text-yellow-800',
-                'Reportada': 'bg-red-100 text-red-800'
-            };
-            return badges[estatus] || 'bg-gray-100 text-gray-800';
-        }
-
-        function getEstatusIcon(estatus) {
-            const icons = {
-                'Activa': '✓',
-                'Inactiva': '✗',
-                'En proceso': '⏳',
-                'Reportada': '⚠️'
-            };
-            return icons[estatus] || '?';
-        }
-
-        function verSucursalesPromocion(idPromocion) {
-            const promo = promociones.find(p => p.id_promocion === idPromocion);
-            const sucursalesPromo = relaciones
-                .filter(r => r.id_promocion === idPromocion)
-                .map(r => sucursales.find(s => s.id_sucursal === r.id_sucursal))
-                .filter(s => s);
-
-            const lista = document.getElementById('listaSucursalesPromo');
-            lista.innerHTML = `
-                <div class="bg-blue-50 p-4 rounded-lg mb-4">
-                    <p class="font-bold text-gray-800">${promo.descripcion}</p>
-                    <p class="text-sm text-gray-600">${promo.tipo_promocion} - $${Number(promo.precio).toFixed(2)}</p>
-                </div>
-                ${sucursalesPromo.map(s => `
-                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="font-semibold text-gray-800">${s.nombre_sucursal}</p>
-                                <p class="text-sm text-gray-600">${s.ciudad || '-'}</p>
-                                <p class="text-xs text-gray-500">${s.telefono || 'Sin teléfono'}</p>
-                            </div>
-                            <span class="px-3 py-1 text-xs rounded-full ${s.activa !== false ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
-                                ${s.activa !== false ? '✓ Activa' : '✗ Inactiva'}
-                            </span>
-                        </div>
-                    </div>
-                `).join('')}
-            `;
-
-            document.getElementById('modalVerSucursales').classList.remove('hidden');
-        }
-
-        function cerrarModalVerSucursales() {
-            document.getElementById('modalVerSucursales').classList.add('hidden');
-        }
-
-        function mostrarConfirmacionAprobarTodas() {
-            const promosEnProceso = promociones.filter(p => p.estatus === 'En proceso');
-
-            if (promosEnProceso.length === 0) {
-                mostrarToast('No hay promociones en proceso', 'info');
-                return;
-            }
-
-            const lista = document.getElementById('listaPromosAprobar');
-            lista.innerHTML = promosEnProceso.map(promo => {
-                const sucursalesPromo = relaciones.filter(r => r.id_promocion === promo.id_promocion).length;
-                return `
-                    <div class="border border-yellow-200 bg-yellow-50 rounded-lg p-4">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <p class="font-semibold text-gray-800 flex items-center gap-2">
-                                    <span class="px-2 py-1 text-xs rounded ${promo.tipo_promocion === 'Ortodoncia' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}">
-                                        ${promo.tipo_promocion}
-                                    </span>
-                                    ${promo.descripcion}
-                                </p>
-                                <div class="mt-2 text-sm text-gray-600 space-y-1">
-                                    <p>💰 Precio: $${Number(promo.precio).toFixed(2)}</p>
-                                    ${promo.tipo_promocion === 'Ortodoncia' && promo.mensualidad ? `<p>💳 Mensualidad: $${Number(promo.mensualidad).toFixed(2)}</p>` : ''}
-                                    ${promo.medio ? `<p>📢 Medio: ${getMedioIcon(promo.medio)} ${promo.medio}</p>` : ''}
-                                    <p>🏢 Sucursales: ${sucursalesPromo}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            document.getElementById('modalConfirmarAprobar').classList.remove('hidden');
-        }
-
-        function cerrarModalConfirmarAprobar() {
-            document.getElementById('modalConfirmarAprobar').classList.add('hidden');
-        }
-
-        async function aprobarTodasConfirmado() {
-            const promosEnProceso = promociones.filter(p => p.estatus === 'En proceso');
-
-            try {
-                for (const promo of promosEnProceso) {
-                    await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${promo.id_promocion}`, {
-                        method: 'PATCH',
-                        headers,
-                        body: JSON.stringify({ estatus: 'Activa' })
-                    });
-                }
-
-                cerrarModalConfirmarAprobar();
-                await cargarDatos();
-                mostrarToast(`${promosEnProceso.length} promoción(es) aprobada(s)`, 'success');
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarToast('Error al aprobar promociones', 'error');
-            }
-        }
-
-        function renderizarTablaPromociones() {
-            const tbody = document.getElementById('tablaPromociones');
-            if (promocionesFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="px-6 py-4 text-center text-gray-500">No hay promociones</td></tr>';
-                document.getElementById('infoPromos').textContent = '';
-                document.getElementById('paginacionPromos').innerHTML = '';
-                return;
-            }
-
-            const totalPaginas = Math.ceil(promocionesFiltradas.length / itemsPorPagina);
-            const inicio = (paginaActual - 1) * itemsPorPagina;
-            const fin = inicio + itemsPorPagina;
-            const promosPagina = promocionesFiltradas.slice(inicio, fin);
-
-            tbody.innerHTML = promosPagina.map(promo => {
-                const sucursalesAsignadas = relaciones.filter(r => r.id_promocion === promo.id_promocion);
-                const vigencia = promo.fecha_inicio || promo.fecha_fin 
-                    ? `${formatearFecha(promo.fecha_inicio)} - ${formatearFecha(promo.fecha_fin)}`
-                    : 'Sin límite';
-
-                return `
-                    <tr class="hover:bg-gray-50 ${promo.estatus === 'Reportada' ? 'bg-red-50' : ''}">
-                        <td class="px-3 py-4 text-xs font-semibold ${promo.tipo_promocion === 'Ortodoncia' ? 'text-purple-600' : 'text-blue-600'}">
-                            ${promo.tipo_promocion}
-                        </td>
-                        <td class="px-3 py-4 text-sm text-gray-900">
-                            ${promo.descripcion.substring(0, 35)}${promo.descripcion.length > 35 ? '...' : ''}
-                            ${promo.estatus === 'Reportada' ? '<span class="badge-reportada">REPORTADA</span>' : ''}
-                        </td>
-                        <td class="px-3 py-4 text-sm font-semibold text-green-600">$${Number(promo.precio).toFixed(2)}</td>
-                        <td class="px-3 py-4 text-sm text-purple-600">
-                            ${promo.tipo_promocion === 'Ortodoncia' && promo.mensualidad ? '$' + Number(promo.mensualidad).toFixed(2) : '-'}
-                        </td>
-                        <td class="px-3 py-4 text-xs">
-                            ${promo.medio ? getMedioIcon(promo.medio) + ' ' + promo.medio : '-'}
-                        </td>
-                        <td class="px-3 py-4">
-                            <span class="px-2 py-1 text-xs rounded-full ${getEstatusBadge(promo.estatus)}">
-                                ${getEstatusIcon(promo.estatus)} ${promo.estatus}
-                            </span>
-                        </td>
-                        <td class="px-3 py-4 text-xs text-gray-600">${vigencia}</td>
-                        <td class="px-3 py-4 text-center">
-                            <button onclick="verSucursalesPromocion(${promo.id_promocion})" class="text-blue-600 hover:text-blue-800 font-semibold" title="Ver sucursales">
-                                ${sucursalesAsignadas.length} <i class="fas fa-eye ml-1"></i>
-                            </button>
-                        </td>
-                        <td class="px-3 py-4">
-                            <div class="flex gap-1">
-                                <button onclick="editarPromocion(${promo.id_promocion})" 
-                                        class="text-blue-600 hover:text-blue-800" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                ${promo.estatus === 'En proceso' ? `
-                                    <button onclick="cambiarEstatusPromo(${promo.id_promocion}, 'Activa')" 
-                                            class="text-green-600 hover:text-green-800" title="Aprobar">
-                                        <i class="fas fa-check"></i>
-                                    </button>
-                                ` : ''}
-                                ${promo.estatus !== 'Reportada' ? `
-                                    <button onclick="reportarPromocion(${promo.id_promocion})" 
-                                            class="text-red-600 hover:text-red-800" title="Reportar">
-                                        <i class="fas fa-flag"></i>
-                                    </button>
-                                ` : ''}
-                                <button onclick="eliminarPromo(${promo.id_promocion})" 
-                                        class="text-gray-600 hover:text-gray-800" title="Eliminar">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-
-            document.getElementById('infoPromos').textContent = `Mostrando ${inicio + 1} - ${Math.min(fin, promocionesFiltradas.length)} de ${promocionesFiltradas.length} promociones`;
-
-            let paginacionHTML = '';
-            if (paginaActual > 1) {
-                paginacionHTML += `<button onclick="cambiarPagina(${paginaActual - 1})" class="px-3 py-1 border rounded hover:bg-gray-100">Anterior</button>`;
-            }
-            for (let i = 1; i <= totalPaginas; i++) {
-                if (i === paginaActual) {
-                    paginacionHTML += `<button class="px-3 py-1 border rounded bg-blue-600 text-white">${i}</button>`;
-                } else if (Math.abs(i - paginaActual) <= 2 || i === 1 || i === totalPaginas) {
-                    paginacionHTML += `<button onclick="cambiarPagina(${i})" class="px-3 py-1 border rounded hover:bg-gray-100">${i}</button>`;
-                } else if (Math.abs(i - paginaActual) === 3) {
-                    paginacionHTML += `<span class="px-2">...</span>`;
-                }
-            }
-            if (paginaActual < totalPaginas) {
-                paginacionHTML += `<button onclick="cambiarPagina(${paginaActual + 1})" class="px-3 py-1 border rounded hover:bg-gray-100">Siguiente</button>`;
-            }
-            document.getElementById('paginacionPromos').innerHTML = paginacionHTML;
-        }
-
-        function cambiarPagina(pagina) {
-            paginaActual = pagina;
-            renderizarTablaPromociones();
-        }
-
-        async function reportarPromocion(id) {
-            const motivo = prompt('Motivo del reporte (opcional):');
-
-            try {
-                await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${id}`, {
-                    method: 'PATCH',
-                    headers,
-                    body: JSON.stringify({ 
-                        estatus: 'Reportada',
-                        reportada_por: motivo || 'Sin motivo especificado',
-                        fecha_reporte: new Date().toISOString()
-                    })
-                });
-
-                await cargarDatos();
-                mostrarToast('Promoción reportada correctamente', 'warning');
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarToast('Error al reportar promoción', 'error');
-            }
-        }
-
-        async function cambiarEstatusPromo(id, nuevoEstatus) {
-            try {
-                await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${id}`, {
-                    method: 'PATCH',
-                    headers,
-                    body: JSON.stringify({ estatus: nuevoEstatus })
-                });
-                await cargarDatos();
-                mostrarToast(`Promoción marcada como ${nuevoEstatus}`, 'success');
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarToast('Error al cambiar estatus', 'error');
-            }
-        }
-
-        function renderizarTablaSucursales() {
-            const tbody = document.getElementById('tablaSucursales');
-            tbody.innerHTML = sucursales.map(suc => {
-                const cantPromos = relaciones.filter(r => r.id_sucursal === suc.id_sucursal).length;
-                const activa = suc.activa !== false;
-                const sinHorario = !suc.horarios;
-
-                return `
-                <tr class="hover:bg-gray-50 ${!activa ? 'opacity-60' : ''}">
-                    <td class="px-6 py-4 text-sm font-bold text-blue-600">${suc.id_sucursal}</td>
-                    <td class="px-6 py-4 text-sm font-medium text-gray-900">${suc.nombre_sucursal}</td>
-                    <td class="px-6 py-4 text-sm text-gray-600">${suc.ciudad || '-'}</td>
-                    <td class="px-6 py-4 text-sm text-gray-600">${suc.telefono || '-'}</td>
-                    <td class="px-6 py-4 text-xs ${sinHorario ? 'text-yellow-700' : 'text-gray-500'}">
-                        ${sinHorario 
-                            ? '<span class="sin-horario">⚠️ Sin horario</span>' 
-                            : (suc.horarios.substring(0, 30) + (suc.horarios.length > 30 ? '...' : ''))}
-                    </td>
-                    <td class="px-6 py-4">
-                        <span class="px-2 py-1 text-xs rounded-full ${activa ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
-                            ${activa ? '✓ Activa' : '✗ Inactiva'}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-sm font-semibold text-blue-600">${cantPromos}</td>
-                    <td class="px-6 py-4">
-                        <button onclick="editarHorarioSucursal(${suc.id_sucursal})" 
-                                class="text-blue-600 hover:text-blue-800 text-lg" title="Editar horarios">
-                            <i class="fas fa-clock"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-            }).join('');
-        }
-
-        function renderizarPromosPorSucursal() {
-            const tbody = document.getElementById('tablaSucursalesPromos');
-            const sucursalesActivas = sucursales.filter(s => s.activa !== false);
-            tbody.innerHTML = sucursalesActivas.map(suc => {
-                const promosEnSucursal = relaciones.filter(r => r.id_sucursal === suc.id_sucursal);
-                const promosActivas = promosEnSucursal.filter(r => {
-                    const promo = promociones.find(p => p.id_promocion === r.id_promocion);
-                    return promo && promo.estatus === 'Activa';
-                }).length;
-                const promosEnProceso = promosEnSucursal.filter(r => {
-                    const promo = promociones.find(p => p.id_promocion === r.id_promocion);
-                    return promo && promo.estatus === 'En proceso';
-                }).length;
-
-                return `
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 text-sm font-medium text-gray-900">${suc.nombre_sucursal}</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">${suc.ciudad || '-'}</td>
-                        <td class="px-6 py-4 text-sm font-semibold text-blue-600">${promosEnSucursal.length}</td>
-                        <td class="px-6 py-4 text-sm font-semibold text-green-600">${promosActivas}</td>
-                        <td class="px-6 py-4 text-sm font-semibold text-yellow-600">${promosEnProceso}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function llenarSelectSucursales() {
-            const select = document.getElementById('filtroSucursal');
-            if (select) {
-                const valorActual = select.value;
-                const sucursalesActivas = sucursales.filter(s => s.activa !== false);
-                select.innerHTML = '<option value="">Todas las sucursales</option>' +
-                    sucursalesActivas.map(s => `<option value="${s.id_sucursal}">${s.nombre_sucursal}</option>`).join('');
-                select.value = valorActual;
-            }
-        }
-
-        function llenarCheckboxesSucursales(sucursalesSeleccionadas = []) {
-            const container = document.getElementById('checkboxesSucursales');
-            const sucursalesActivas = sucursales.filter(s => s.activa !== false);
-            container.innerHTML = sucursalesActivas.map(s => {
-                const checked = sucursalesSeleccionadas.includes(s.id_sucursal) ? 'checked' : '';
-                return `
-                <label class="flex items-center space-x-3 cursor-pointer hover:bg-white p-3 rounded-lg transition group">
-                    <input type="checkbox" name="sucursales" value="${s.id_sucursal}" ${checked}
-                           class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
-                    <div class="flex-1">
-                        <span class="text-sm font-medium text-gray-900 group-hover:text-blue-600">${s.nombre_sucursal}</span>
-                        <span class="text-xs text-gray-500 ml-2">${s.ciudad}</span>
-                    </div>
-                </label>
-            `;
-            }).join('');
-        }
-
-        function seleccionarTodasSucursales() {
-            document.querySelectorAll('#checkboxesSucursales input[type="checkbox"]').forEach(cb => cb.checked = true);
-        }
-
-        function deseleccionarTodasSucursales() {
-            document.querySelectorAll('#checkboxesSucursales input[type="checkbox"]').forEach(cb => cb.checked = false);
-        }
-
-        function mostrarFormNuevaPromocion() {
-            document.getElementById('tituloModalPromo').textContent = '➕ Nueva Promoción';
-            document.getElementById('idPromocionEditar').value = '';
-            document.getElementById('formPromocion').reset();
-            document.getElementById('estatus').value = 'En proceso';
-
-            // ESTABLECER FECHAS DEL SIGUIENTE MES POR DEFAULT
-            const fechas = obtenerFechasSiguienteMes();
-            document.getElementById('fechaInicio').value = fechas.inicio;
-            document.getElementById('fechaFin').value = fechas.fin;
-
-            toggleMensualidad();
-            llenarCheckboxesSucursales();
-            document.getElementById('modalPromocion').classList.remove('hidden');
-        }
-
-        function cerrarModalPromocion() {
-            document.getElementById('modalPromocion').classList.add('hidden');
-            document.getElementById('formPromocion').reset();
-        }
-
-        function editarPromocion(idPromocion) {
-            const promo = promociones.find(p => p.id_promocion === idPromocion);
-            if (!promo) return;
-
-            document.getElementById('tituloModalPromo').textContent = '✏️ Editar Promoción';
-            document.getElementById('idPromocionEditar').value = promo.id_promocion;
-            document.getElementById('tipoPromocion').value = promo.tipo_promocion || 'Integrales';
-            document.getElementById('descripcion').value = promo.descripcion;
-            document.getElementById('precio').value = promo.precio;
-            document.getElementById('mensualidad').value = promo.mensualidad || '';
-            document.getElementById('medio').value = promo.medio || '';
-            document.getElementById('terminosCondiciones').value = promo.terminos_condiciones || '';
-            document.getElementById('estatus').value = promo.estatus || 'En proceso';
-            document.getElementById('fechaInicio').value = promo.fecha_inicio || '';
-            document.getElementById('fechaFin').value = promo.fecha_fin || '';
-
-            toggleMensualidad();
-
-            const sucursalesAsignadas = relaciones.filter(r => r.id_promocion === idPromocion).map(r => r.id_sucursal);
-            llenarCheckboxesSucursales(sucursalesAsignadas);
-
-            document.getElementById('modalPromocion').classList.remove('hidden');
-        }
-
-        async function guardarPromocion(event) {
+        async function guardarPlataforma(event) {
             event.preventDefault();
 
-            const idEditar = document.getElementById('idPromocionEditar').value;
-            const tipoPromocion = document.getElementById('tipoPromocion').value;
-            const descripcion = document.getElementById('descripcion').value;
-            const precio = parseFloat(document.getElementById('precio').value);
-            const mensualidad = tipoPromocion === 'Ortodoncia' ? parseFloat(document.getElementById('mensualidad').value) : null;
-            const medio = document.getElementById('medio').value || null;
-            const terminosCondiciones = document.getElementById('terminosCondiciones').value || null;
-            const estatus = document.getElementById('estatus').value;
-            const fechaInicio = document.getElementById('fechaInicio').value || null;
-            const fechaFin = document.getElementById('fechaFin').value || null;
-            const sucursalesSeleccionadas = Array.from(document.querySelectorAll('input[name="sucursales"]:checked')).map(cb => parseInt(cb.value));
-
-            if (sucursalesSeleccionadas.length === 0) {
-                mostrarToast('Selecciona al menos una sucursal', 'warning');
-                return;
-            }
-
+            const idEditar = document.getElementById('idPlataformaEditar').value;
             const datos = {
-                tipo_promocion: tipoPromocion,
-                descripcion,
-                precio,
-                mensualidad,
-                medio,
-                terminos_condiciones: terminosCondiciones,
-                estatus,
-                fecha_inicio: fechaInicio,
-                fecha_fin: fechaFin
+                zona: document.getElementById('zonaPlataforma').value,
+                token: document.getElementById('tokenPlataforma').value,
+                activa: document.getElementById('activaPlataforma').value === 'true'
             };
 
             try {
-                let idPromocion;
-
                 if (idEditar) {
-                    await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${idEditar}`, {
+                    await fetch(`${SUPABASE_URL}/plataformas?id_plataforma=eq.${idEditar}`, {
                         method: 'PATCH',
                         headers,
                         body: JSON.stringify(datos)
                     });
-                    idPromocion = parseInt(idEditar);
-
-                    await fetch(`${SUPABASE_URL}/sucursal_promocion?id_promocion=eq.${idPromocion}`, {
-                        method: 'DELETE',
-                        headers
-                    });
+                    mostrarToast('Plataforma actualizada correctamente', 'success');
                 } else {
-                    const responsePromo = await fetch(`${SUPABASE_URL}/promociones`, {
+                    await fetch(`${SUPABASE_URL}/plataformas`, {
                         method: 'POST',
                         headers,
                         body: JSON.stringify(datos)
                     });
-                    const [nuevaPromo] = await responsePromo.json();
-                    idPromocion = nuevaPromo.id_promocion;
+                    mostrarToast('Plataforma creada correctamente', 'success');
                 }
 
-                const relacionesNuevas = sucursalesSeleccionadas.map(id_suc => ({
-                    id_sucursal: id_suc,
-                    id_promocion: idPromocion
-                }));
-
-                await fetch(`${SUPABASE_URL}/sucursal_promocion`, {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify(relacionesNuevas)
-                });
-
-                mostrarToast(idEditar ? 'Promoción actualizada correctamente' : 'Promoción creada correctamente', 'success');
-                cerrarModalPromocion();
-                await cargarDatos();
+                cerrarModalPlataforma();
+                await cargarPlataformas();
             } catch (error) {
                 console.error('Error:', error);
-                mostrarToast('Error al guardar la promoción', 'error');
+                mostrarToast('Error al guardar plataforma', 'error');
             }
         }
 
-        async function eliminarPromo(id) {
-            if (!confirm('⚠️ ¿Eliminar esta promoción?')) return;
+        async function eliminarPlataforma(idPlataforma) {
+            if (!confirm('⚠️ ¿Eliminar esta plataforma? Se eliminarán también sus aranceles.')) return;
 
             try {
-                await fetch(`${SUPABASE_URL}/promociones?id_promocion=eq.${id}`, {
+                await fetch(`${SUPABASE_URL}/plataformas?id_plataforma=eq.${idPlataforma}`, {
                     method: 'DELETE',
                     headers
                 });
-                mostrarToast('Promoción eliminada correctamente', 'success');
-                await cargarDatos();
-            } catch (error) {
-                mostrarToast('Error al eliminar', 'error');
-            }
-        }
-
-        function editarHorarioSucursal(idSucursal) {
-            const suc = sucursales.find(s => s.id_sucursal === idSucursal);
-            if (!suc) return;
-
-            document.getElementById('idSucursalEditar').value = suc.id_sucursal;
-            document.getElementById('nombreSucursalModal').textContent = suc.nombre_sucursal;
-            document.getElementById('ciudadSucursalModal').textContent = suc.ciudad || 'Sin ciudad';
-            document.getElementById('horariosSucursal').value = suc.horarios || '';
-
-            document.getElementById('modalSucursal').classList.remove('hidden');
-        }
-
-        function cerrarModalSucursal() {
-            document.getElementById('modalSucursal').classList.add('hidden');
-            document.getElementById('formSucursal').reset();
-        }
-
-        async function guardarHorarioSucursal(event) {
-            event.preventDefault();
-
-            const idSucursal = document.getElementById('idSucursalEditar').value;
-            const horarios = document.getElementById('horariosSucursal').value || null;
-
-            try {
-                await fetch(`${SUPABASE_URL}/sucursales?id_sucursal=eq.${idSucursal}`, {
-                    method: 'PATCH',
-                    headers,
-                    body: JSON.stringify({ horarios })
-                });
-
-                mostrarToast('Horarios actualizados correctamente', 'success');
-                cerrarModalSucursal();
-                await cargarDatos();
+                mostrarToast('Plataforma eliminada correctamente', 'success');
+                await cargarPlataformas();
             } catch (error) {
                 console.error('Error:', error);
-                mostrarToast('Error al guardar horarios', 'error');
+                mostrarToast('Error al eliminar', 'error');
             }
-        }
-
-        function filtrarPromociones() {
-            aplicarFiltrosActuales();
-            paginaActual = 1;
-            renderizarTablaPromociones();
         }
     </script>
 </body>
