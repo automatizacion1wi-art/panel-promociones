@@ -240,7 +240,7 @@
         }
 
         async function cargarSucursales() {
-            const response = await fetch(`${SUPABASE_URL}/sucursales?select=*`, { headers });
+            const response = await fetch(`${SUPABASE_URL}/promociones?select=*&order=id_promocion.desc`, { headers });
             sucursales = await response.json();
             llenarSelectSucursales();
             llenarCheckboxesSucursales();
