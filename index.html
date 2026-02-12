@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DX-RAY v6.0 SIMPLIFICADO</title>
+    <title>DX-RAY v6.1 FINAL</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦷</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -35,8 +35,8 @@
         <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
             <div class="container mx-auto px-6 py-4 flex justify-between items-center">
                 <div>
-                    <h1 class="text-3xl font-bold">🦷 DX-RAY v6.0</h1>
-                    <p class="text-blue-100">Sistema Simplificado - Control Manual</p>
+                    <h1 class="text-3xl font-bold">🦷 DX-RAY v6.1</h1>
+                    <p class="text-blue-100">Sistema Corregido - Sin Conflictos</p>
                 </div>
                 <button onclick="recargarDatos()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg flex items-center gap-2 transition">
                     <i class="fas fa-sync-alt" id="iconRecargar"></i>
@@ -128,7 +128,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plataforma</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categorías</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prestaciones</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursales Asignadas</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursales</th>
                                 </tr>
                             </thead>
                             <tbody id="tablaResumen" class="bg-white divide-y divide-gray-200"></tbody>
@@ -189,7 +189,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ciudad</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plataforma</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aranceles Asignados</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aranceles</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
                                 </tr>
                             </thead>
@@ -213,7 +213,7 @@
                     <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
                         <p class="text-sm text-blue-800">
                             <i class="fas fa-info-circle mr-2"></i>
-                            <strong>3 Niveles:</strong> Token → Aranceles → Categorías → Prestaciones (sin tocar sucursales)
+                            <strong>3 Niveles:</strong> Token → Aranceles → Categorías → Prestaciones
                         </p>
                     </div>
 
@@ -248,7 +248,7 @@
                 </div>
             </div>
 
-            <!-- ASIGNACIONES (NUEVA PESTAÑA) -->
+            <!-- ASIGNACIONES -->
             <div id="section-asignaciones" class="section-hidden">
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex justify-between items-center mb-6">
@@ -262,7 +262,7 @@
                     <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-6">
                         <p class="text-sm text-yellow-800">
                             <i class="fas fa-hand-pointer mr-2"></i>
-                            <strong>Instrucciones:</strong> Selecciona cada sucursal y marca a qué aranceles pertenece. Los aranceles pueden ser de diferentes plataformas.
+                            <strong>Instrucciones:</strong> Selecciona checkboxes para asignar sucursales a aranceles. Luego click "Guardar".
                         </p>
                     </div>
 
@@ -290,7 +290,7 @@
                         <input type="text" id="zonaPlataforma" required placeholder="Ej: Tuxtla" class="w-full border border-gray-300 rounded-lg px-4 py-2">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Token Dentalink</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Token</label>
                         <textarea id="tokenPlataforma" required placeholder="Token API" class="w-full border border-gray-300 rounded-lg px-4 py-2" rows="3"></textarea>
                     </div>
                     <div>
@@ -341,7 +341,7 @@
 
         let plataformas = [], aranceles = [], categorias = [], prestaciones = [], sucursales = [], arancelSucursal = [];
         let prestacionesFiltradas = [], paginaActual = 1, itemsPorPagina = 20;
-        let asignacionesPendientes = {}; // Para guardar cambios temporales
+        let asignacionesPendientes = {};
 
         document.addEventListener('DOMContentLoaded', cargarDatos);
 
@@ -450,7 +450,7 @@
             document.getElementById(`tab-${seccion}`).classList.remove('text-gray-600');
         }
 
-        // SINCRONIZACIÓN PRESTACIONES (3 NIVELES SIN SUCURSALES)
+        // SINCRONIZACIÓN PRESTACIONES (CORREGIDA - SIN 409)
         async function sincronizarPrestaciones() {
             if (plataformas.length === 0) {
                 mostrarToast('Crea una plataforma primero', 'warning');
@@ -458,7 +458,7 @@
                 return;
             }
 
-            mostrarProgreso('Iniciando sincronización...', 5);
+            mostrarProgreso('Iniciando...', 5);
 
             try {
                 for (let p = 0; p < plataformas.length; p++) {
@@ -468,7 +468,7 @@
                     const token = plat.token;
                     const idPlat = plat.id_plataforma;
 
-                    mostrarProgreso(`Procesando plataforma: ${plat.zona}`, 10 + (p / plataformas.length * 10));
+                    mostrarProgreso(`Plataforma: ${plat.zona}`, 10 + (p / plataformas.length * 10));
 
                     // NIVEL 1: Aranceles
                     const resAranceles = await fetch(`${DENTALINK_API}/aranceles`, {
@@ -485,7 +485,7 @@
                         const arancel = arancelesDL[i];
                         const prog = 30 + ((i / arancelesDL.length) * 50);
 
-                        // Guardar arancel
+                        // Guardar arancel (POST o PATCH si 409)
                         const datosArancel = {
                             id_arancel_dentalink: arancel.id,
                             id_plataforma: idPlat,
@@ -499,15 +499,15 @@
                             body: JSON.stringify(datosArancel)
                         });
 
-                        if (!resA.ok && resA.status === 409) {
+                        if (resA.status === 409) {
                             await fetch(`${SUPABASE_URL}/aranceles?id_arancel_dentalink=eq.${arancel.id}&id_plataforma=eq.${idPlat}`, {
                                 method: 'PATCH',
                                 headers,
-                                body: JSON.stringify(datosArancel)
+                                body: JSON.stringify({ nombre: arancel.nombre, habilitado: true })
                             });
                         }
 
-                        // Obtener id_arancel_interno que se creó
+                        // Obtener id_arancel_interno
                         const resArancelCreado = await fetch(`${SUPABASE_URL}/aranceles?id_arancel_dentalink=eq.${arancel.id}&id_plataforma=eq.${idPlat}&select=id_arancel_interno`, { headers });
                         const arancelCreado = await resArancelCreado.json();
                         const idArancelInterno = arancelCreado[0]?.id_arancel_interno;
@@ -538,11 +538,11 @@
                                 body: JSON.stringify(datosCat)
                             });
 
-                            if (!resC.ok && resC.status === 409) {
+                            if (resC.status === 409) {
                                 await fetch(`${SUPABASE_URL}/categorias?id_categoria_dentalink=eq.${cat.id}&id_arancel_interno=eq.${idArancelInterno}`, {
                                     method: 'PATCH',
                                     headers,
-                                    body: JSON.stringify(datosCat)
+                                    body: JSON.stringify({ nombre: cat.nombre, tipo: cat.tipo, habilitado: true })
                                 });
                             }
 
@@ -581,11 +581,11 @@
                                     body: JSON.stringify(datosPrest)
                                 });
 
-                                if (!resP.ok && resP.status === 409) {
+                                if (resP.status === 409) {
                                     await fetch(`${SUPABASE_URL}/prestaciones?id_prestacion_dentalink=eq.${prest.id}&id_categoria_interno=eq.${idCatInterno}`, {
                                         method: 'PATCH',
                                         headers,
-                                        body: JSON.stringify(datosPrest)
+                                        body: JSON.stringify({ nombre: prest.nombre, precio: prest.precio || 0, habilitado: true })
                                     });
                                 }
                             }
@@ -607,7 +607,7 @@
             }
         }
 
-        // SINCRONIZAR SUCURSALES
+        // SINCRONIZAR SUCURSALES (CORREGIDA - SIN 409)
         async function sincronizarSucursales() {
             if (plataformas.length === 0) {
                 mostrarToast('Crea plataformas primero', 'warning');
@@ -646,7 +646,7 @@
                             body: JSON.stringify(datos)
                         });
 
-                        if (!resS.ok && resS.status === 409) {
+                        if (resS.status === 409) {
                             await fetch(`${SUPABASE_URL}/sucursales?id_sucursal_dentalink=eq.${suc.id}&id_plataforma=eq.${plat.id_plataforma}`, {
                                 method: 'PATCH',
                                 headers,
@@ -663,6 +663,61 @@
             } catch (error) {
                 icon.classList.remove('fa-spin');
                 mostrarToast(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // GUARDAR ASIGNACIONES (CORREGIDA - SIN 400 NI 409)
+        async function guardarAsignaciones() {
+            try {
+                mostrarProgreso('Guardando asignaciones...', 10);
+
+                // PASO 1: Obtener asignaciones actuales
+                const resActuales = await fetch(`${SUPABASE_URL}/arancel_sucursal?select=*`, { headers });
+                const asignacionesActuales = await resActuales.json();
+
+                mostrarProgreso('Eliminando asignaciones antiguas...', 30);
+
+                // PASO 2: Eliminar cada asignación individualmente
+                for (const asig of asignacionesActuales) {
+                    await fetch(`${SUPABASE_URL}/arancel_sucursal?id=eq.${asig.id}`, {
+                        method: 'DELETE',
+                        headers
+                    });
+                }
+
+                mostrarProgreso('Creando nuevas asignaciones...', 60);
+
+                // PASO 3: Crear nuevas asignaciones (evitando 409)
+                for (const [idSucursal, aranceles] of Object.entries(asignacionesPendientes)) {
+                    for (const idArancel of aranceles) {
+                        const datos = {
+                            id_sucursal_interno: parseInt(idSucursal),
+                            id_arancel_interno: idArancel
+                        };
+
+                        const resPost = await fetch(`${SUPABASE_URL}/arancel_sucursal`, {
+                            method: 'POST',
+                            headers,
+                            body: JSON.stringify(datos)
+                        });
+
+                        // Si ya existe (409), lo ignoramos silenciosamente
+                        if (resPost.status !== 409 && !resPost.ok) {
+                            console.error('Error creando asignación:', await resPost.text());
+                        }
+                    }
+                }
+
+                mostrarProgreso('Finalizando...', 90);
+                await cargarDatos();
+
+                ocultarProgreso();
+                mostrarToast('✅ Asignaciones guardadas');
+
+            } catch (error) {
+                console.error('Error:', error);
+                ocultarProgreso();
+                mostrarToast('Error al guardar', 'error');
             }
         }
 
@@ -717,7 +772,7 @@
                     <td class="px-6 py-4 text-sm font-bold text-purple-600">${numAranceles}</td>
                     <td class="px-6 py-4">
                         <span class="px-2 py-1 text-xs rounded-full ${s.activa ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
-                            ${s.activa ? '✓ Activa' : '✗ Inactiva'}
+                            ${s.activa ? '✓' : '✗'}
                         </span>
                     </td>
                 </tr>
@@ -819,7 +874,6 @@
             }).join('');
         }
 
-        // ASIGNACIONES (NUEVA FUNCIONALIDAD)
         function renderizarAsignaciones() {
             const contenedor = document.getElementById('contenedorAsignaciones');
             if (sucursales.length === 0 || aranceles.length === 0) {
@@ -832,7 +886,7 @@
                 return;
             }
 
-            // Inicializar asignacionesPendientes con datos actuales
+            // Inicializar asignacionesPendientes
             asignacionesPendientes = {};
             arancelSucursal.forEach(as => {
                 if (!asignacionesPendientes[as.id_sucursal_interno]) {
@@ -893,41 +947,6 @@
             }
         }
 
-        async function guardarAsignaciones() {
-            try {
-                // Eliminar todas las asignaciones actuales
-                await fetch(`${SUPABASE_URL}/arancel_sucursal`, {
-                    method: 'DELETE',
-                    headers
-                });
-
-                // Crear nuevas asignaciones
-                const promesas = [];
-                for (const [idSucursal, aranceles] of Object.entries(asignacionesPendientes)) {
-                    for (const idArancel of aranceles) {
-                        promesas.push(
-                            fetch(`${SUPABASE_URL}/arancel_sucursal`, {
-                                method: 'POST',
-                                headers,
-                                body: JSON.stringify({
-                                    id_sucursal_interno: parseInt(idSucursal),
-                                    id_arancel_interno: idArancel
-                                })
-                            })
-                        );
-                    }
-                }
-
-                await Promise.all(promesas);
-                await cargarDatos();
-                mostrarToast('✅ Asignaciones guardadas correctamente');
-
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarToast('Error al guardar asignaciones', 'error');
-            }
-        }
-
         function llenarSelectsPlataforma() {
             const selectSuc = document.getElementById('filtroPlataformaSucursales');
             const selectPrest = document.getElementById('filtroPlatPrest');
@@ -938,7 +957,6 @@
             if (selectSuc) selectSuc.innerHTML = opciones;
             if (selectPrest) {
                 selectPrest.innerHTML = opciones;
-                // Llenar select aranceles
                 const selectArancel = document.getElementById('filtroArancelPrest');
                 if (selectArancel) {
                     selectArancel.innerHTML = '<option value="">Todos</option>' +
@@ -1003,7 +1021,7 @@
         }
 
         async function eliminarPlataforma(id) {
-            if (!confirm('⚠️ ¿Eliminar plataforma y todos sus datos?')) return;
+            if (!confirm('⚠️ ¿Eliminar plataforma?')) return;
             try {
                 await fetch(`${SUPABASE_URL}/plataformas?id_plataforma=eq.${id}`, {
                     method: 'DELETE',
