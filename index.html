@@ -11,9 +11,8 @@
         .tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; }
         .section-hidden { display: none; }
         .toast {
-            position: fixed; top: 20px; right: 20px; padding: 16px 24px;
-            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 9999; animation: slideIn 0.3s ease-out;
+            position: fixed; top: 20px; right: 20px; padding: 16px 24px; border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; animation: slideIn 0.3s ease-out;
             display: flex; align-items: center; gap: 12px; min-width: 300px;
         }
         .toast-success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
@@ -35,4 +34,975 @@
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- Generado: 2026-02-12 00:01:29 -->
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold">🦷 Dashboard DX-RAY</h1>
+                    <p class="text-blue-100">Sistema Completo de Gestión Dentalink v5.0</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="recargarDatos()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                        <i class="fas fa-sync-alt" id="iconRecargar"></i>
+                        Recargar
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navegación -->
+        <div class="bg-white shadow-md border-b">
+            <div class="container mx-auto px-6">
+                <nav class="flex gap-8">
+                    <button onclick="cambiarSeccion('dashboard')" id="tab-dashboard" class="tab-active py-4 px-2 font-medium transition">
+                        <i class="fas fa-chart-line mr-2"></i>Dashboard
+                    </button>
+                    <button onclick="cambiarSeccion('promociones')" id="tab-promociones" class="py-4 px-2 font-medium text-gray-600 hover:text-blue-600 transition">
+                        <i class="fas fa-tags mr-2"></i>Promociones
+                    </button>
+                    <button onclick="cambiarSeccion('sucursales')" id="tab-sucursales" class="py-4 px-2 font-medium text-gray-600 hover:text-blue-600 transition">
+                        <i class="fas fa-building mr-2"></i>Sucursales
+                    </button>
+                    <button onclick="cambiarSeccion('aranceles')" id="tab-aranceles" class="py-4 px-2 font-medium text-gray-600 hover:text-blue-600 transition">
+                        <i class="fas fa-list-alt mr-2"></i>Aranceles
+                    </button>
+                    <button onclick="cambiarSeccion('plataformas')" id="tab-plataformas" class="py-4 px-2 font-medium text-gray-600 hover:text-blue-600 transition">
+                        <i class="fas fa-server mr-2"></i>Plataformas
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <div class="container mx-auto px-6 py-8">
+
+            <!-- SECCIÓN: DASHBOARD -->
+            <div id="section-dashboard">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-medium">Total Prestaciones</p>
+                                <p class="text-3xl font-bold text-gray-800" id="totalPrestaciones">0</p>
+                            </div>
+                            <div class="bg-blue-100 rounded-full p-3">
+                                <i class="fas fa-tags text-blue-600 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-medium">Aranceles</p>
+                                <p class="text-3xl font-bold text-gray-800" id="totalAranceles">0</p>
+                            </div>
+                            <div class="bg-green-100 rounded-full p-3">
+                                <i class="fas fa-list-alt text-green-600 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-medium">Categorías</p>
+                                <p class="text-3xl font-bold text-gray-800" id="totalCategorias">0</p>
+                            </div>
+                            <div class="bg-purple-100 rounded-full p-3">
+                                <i class="fas fa-folder text-purple-600 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-medium">Sucursales</p>
+                                <p class="text-3xl font-bold text-gray-800" id="totalSucursales">0</p>
+                            </div>
+                            <div class="bg-yellow-100 rounded-full p-3">
+                                <i class="fas fa-building text-yellow-600 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">📊 Resumen por Arancel</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Arancel</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categorías</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prestaciones</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursales</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaResumen" class="bg-white divide-y divide-gray-200">
+                                <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: PROMOCIONES -->
+            <div id="section-promociones" class="section-hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">📋 Prestaciones / Promociones</h3>
+                        <button onclick="sincronizarPromociones()" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                            <i class="fas fa-sync" id="iconSyncPromos"></i>
+                            Sincronizar Dentalink
+                        </button>
+                    </div>
+
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+                        <p class="text-sm text-blue-800">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <strong>Modo visualización:</strong> Prestaciones sincronizadas desde Dentalink (3 niveles: Aranceles → Categorías → Prestaciones)
+                        </p>
+                    </div>
+
+                    <div class="mb-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <select id="filtroArancel" onchange="filtrarPrestaciones()" class="border border-gray-300 rounded-lg px-4 py-2">
+                            <option value="">Todos los aranceles</option>
+                        </select>
+                        <select id="filtroCategoria" onchange="filtrarPrestaciones()" class="border border-gray-300 rounded-lg px-4 py-2">
+                            <option value="">Todas las categorías</option>
+                        </select>
+                        <select id="filtroTipo" onchange="filtrarPrestaciones()" class="border border-gray-300 rounded-lg px-4 py-2">
+                            <option value="">Todos los tipos</option>
+                        </select>
+                        <input type="text" id="buscarPrestacion" placeholder="Buscar..." onkeyup="filtrarPrestaciones()" class="border border-gray-300 rounded-lg px-4 py-2">
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categoría</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Precio</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Arancel</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaPrestaciones" class="bg-white divide-y divide-gray-200">
+                                <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Sincroniza con Dentalink primero</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-4 flex justify-between items-center">
+                        <div class="text-sm text-gray-600" id="infoPrestaciones"></div>
+                        <div class="flex gap-2" id="paginacionPrestaciones"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: SUCURSALES -->
+            <div id="section-sucursales" class="section-hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">🏥 Gestión de Sucursales</h3>
+                        <button onclick="sincronizarSucursales()" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                            <i class="fas fa-sync" id="iconSyncSucursales"></i>
+                            Sincronizar Dentalink
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ciudad</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teléfono</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Horarios</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaSucursales" class="bg-white divide-y divide-gray-200">
+                                <tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: ARANCELES -->
+            <div id="section-aranceles" class="section-hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6">📋 Aranceles y Categorías</h3>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Filtrar por Plataforma:</label>
+                        <select id="filtroPlataformaAranceles" onchange="cargarAranceles()" class="border border-gray-300 rounded-lg px-4 py-2 w-full max-w-md">
+                            <option value="">Selecciona una plataforma...</option>
+                        </select>
+                    </div>
+
+                    <div id="contenedorAranceles">
+                        <p class="text-gray-500 text-center py-8">Selecciona una plataforma para ver sus aranceles</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: PLATAFORMAS -->
+            <div id="section-plataformas" class="section-hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">🌐 Plataformas / Tokens</h3>
+                        <button onclick="mostrarFormNuevaPlataforma()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                            <i class="fas fa-plus"></i>
+                            Nueva Plataforma
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Zona</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Token</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaPlataformas" class="bg-white divide-y divide-gray-200">
+                                <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal Plataforma -->
+    <div id="modalPlataforma" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-lg w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800" id="tituloModalPlataforma">➕ Nueva Plataforma</h3>
+                <button onclick="cerrarModalPlataforma()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <form id="formPlataforma" onsubmit="guardarPlataforma(event)">
+                <input type="hidden" id="idPlataformaEditar">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Zona / Región</label>
+                        <input type="text" id="zonaPlataforma" required placeholder="Ej: Tuxtla Gutiérrez" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Token de Dentalink</label>
+                        <textarea id="tokenPlataforma" required placeholder="Token de API" class="w-full border border-gray-300 rounded-lg px-4 py-2" rows="3"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                        <select id="activaPlataforma" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                            <option value="true">Activa</option>
+                            <option value="false">Inactiva</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-6">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <button type="button" onclick="cerrarModalPlataforma()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Sucursal -->
+    <div id="modalSucursal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-lg w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">🕒 Editar Horarios</h3>
+                <button onclick="cerrarModalSucursal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <form id="formSucursal" onsubmit="guardarHorarioSucursal(event)">
+                <input type="hidden" id="idSucursalEditar">
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="text-sm text-gray-600 mb-1">Sucursal:</p>
+                        <p class="text-lg font-bold text-gray-800" id="nombreSucursalModal"></p>
+                        <p class="text-sm text-gray-500" id="ciudadSucursalModal"></p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Horarios</label>
+                        <input type="text" id="horariosSucursal" placeholder="Ej: Lunes a Viernes 10:00 - 19:00" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-6">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <button type="button" onclick="cerrarModalSucursal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-medium">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Progreso Sync -->
+    <div id="syncProgress" class="hidden">
+        <div class="fixed inset-0 bg-black bg-opacity-50 z-50"></div>
+        <div class="sync-progress">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-sync fa-spin text-blue-600 mr-2"></i>
+                Sincronizando con Dentalink
+            </h3>
+            <div class="progress-bar">
+                <div id="syncProgressFill" class="progress-fill" style="width: 0%"></div>
+            </div>
+            <p class="text-sm text-gray-600 mt-2" id="syncProgressText">Iniciando...</p>
+            <div class="mt-4 space-y-2" id="syncProgressDetails"></div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://sdqmuabsdsghptbttwiy.supabase.co/rest/v1';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkcW11YWJzZHNnaHB0YnR0d2l5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MTQ2NjMsImV4cCI6MjA4NTk5MDY2M30.Ki1AazQ5A7QcQuA0wUOjujGAGn1k749VRK2qoD7vNR0';
+        const DENTALINK_API = 'https://api.dentalink.healthatom.com/api/v1';
+        const headers = {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation'
+        };
+
+        let plataformas = [], aranceles = [], categorias = [], prestaciones = [], sucursales = [], arancelSucursal = [];
+        let prestacionesFiltradas = [], paginaActual = 1, itemsPorPagina = 20;
+
+        document.addEventListener('DOMContentLoaded', cargarDatos);
+
+        function mostrarToast(mensaje, tipo = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${tipo}`;
+            const iconos = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+            toast.innerHTML = `<i class="fas ${iconos[tipo]} text-2xl"></i><span class="font-medium">${mensaje}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.classList.add('hiding'); setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        function mostrarProgreso(texto, porcentaje = 0, detalles = '') {
+            document.getElementById('syncProgress').classList.remove('hidden');
+            document.getElementById('syncProgressText').textContent = texto;
+            document.getElementById('syncProgressFill').style.width = porcentaje + '%';
+            if (detalles) {
+                const detailItem = document.createElement('div');
+                detailItem.className = 'text-xs text-gray-600';
+                detailItem.innerHTML = `<i class="fas fa-check text-green-600 mr-2"></i>${detalles}`;
+                document.getElementById('syncProgressDetails').appendChild(detailItem);
+            }
+        }
+
+        function ocultarProgreso() {
+            document.getElementById('syncProgress').classList.add('hidden');
+            document.getElementById('syncProgressDetails').innerHTML = '';
+        }
+
+        async function recargarDatos() {
+            const icon = document.getElementById('iconRecargar');
+            icon.classList.add('fa-spin');
+            await cargarDatos();
+            setTimeout(() => { icon.classList.remove('fa-spin'); mostrarToast('Datos actualizados', 'success'); }, 500);
+        }
+
+        async function cargarDatos() {
+            try {
+                await Promise.all([
+                    cargarPlataformas(), cargarArancelesBD(), cargarCategoriasBD(),
+                    cargarPrestacionesBD(), cargarSucursales(), cargarArancelSucursal()
+                ]);
+                actualizarUI();
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarToast('Error al cargar datos', 'error');
+            }
+        }
+
+        async function cargarPlataformas() {
+            const res = await fetch(`${SUPABASE_URL}/plataformas?select=*&order=id_plataforma.asc`, { headers });
+            plataformas = await res.json();
+            renderizarTablaPlataformas();
+            llenarSelectPlataformas();
+        }
+
+        async function cargarArancelesBD() {
+            const res = await fetch(`${SUPABASE_URL}/aranceles?select=*&order=id_arancel.asc`, { headers });
+            aranceles = await res.json();
+        }
+
+        async function cargarCategoriasBD() {
+            const res = await fetch(`${SUPABASE_URL}/categorias?select=*&order=id_categoria.asc`, { headers });
+            categorias = await res.json();
+        }
+
+        async function cargarPrestacionesBD() {
+            const res = await fetch(`${SUPABASE_URL}/prestaciones?select=*&order=id_prestacion.asc`, { headers });
+            prestaciones = await res.json();
+            aplicarFiltrosPrestaciones();
+        }
+
+        async function cargarSucursales() {
+            const res = await fetch(`${SUPABASE_URL}/sucursales?select=*&order=id_sucursal.asc`, { headers });
+            sucursales = await res.json();
+            renderizarTablaSucursales();
+        }
+
+        async function cargarArancelSucursal() {
+            const res = await fetch(`${SUPABASE_URL}/arancel_sucursal?select=*`, { headers });
+            arancelSucursal = await res.json();
+        }
+
+        function actualizarUI() {
+            document.getElementById('totalPrestaciones').textContent = prestaciones.length;
+            document.getElementById('totalAranceles').textContent = aranceles.length;
+            document.getElementById('totalCategorias').textContent = categorias.length;
+            document.getElementById('totalSucursales').textContent = sucursales.length;
+            renderizarTablaPrestaciones();
+            renderizarResumen();
+            llenarFiltrosPromociones();
+        }
+
+        function cambiarSeccion(seccion) {
+            ['dashboard', 'promociones', 'sucursales', 'aranceles', 'plataformas'].forEach(s => {
+                document.getElementById(`section-${s}`).classList.add('section-hidden');
+                document.getElementById(`tab-${s}`).classList.remove('tab-active');
+                document.getElementById(`tab-${s}`).classList.add('text-gray-600');
+            });
+            document.getElementById(`section-${seccion}`).classList.remove('section-hidden');
+            document.getElementById(`tab-${seccion}`).classList.add('tab-active');
+            document.getElementById(`tab-${seccion}`).classList.remove('text-gray-600');
+        }
+
+        // SINCRONIZACIÓN PROMOCIONES (3 NIVELES)
+        async function sincronizarPromociones() {
+            const plat = plataformas.find(p => p.activa);
+            if (!plat) {
+                mostrarToast('Configura una plataforma activa primero', 'error');
+                cambiarSeccion('plataformas');
+                return;
+            }
+
+            const token = plat.token;
+            const idPlat = plat.id_plataforma;
+
+            mostrarProgreso('Iniciando sincronización...', 5);
+
+            try {
+                // NIVEL 1: Aranceles
+                mostrarProgreso('Obteniendo aranceles...', 10);
+                const resAranceles = await fetch(`${DENTALINK_API}/aranceles`, {
+                    headers: { 'Authorization': `Token ${token}`, 'Content-Type': 'application/json' }
+                });
+                if (!resAranceles.ok) throw new Error('Error al obtener aranceles');
+
+                const dataAranceles = await resAranceles.json();
+                const arancelesDL = (dataAranceles.data || []).filter(a => a.habilitado === 1);
+
+                mostrarProgreso(`${arancelesDL.length} aranceles encontrados`, 20);
+
+                let totalCat = 0, totalPrest = 0;
+
+                for (let i = 0; i < arancelesDL.length; i++) {
+                    const arancel = arancelesDL[i];
+                    const prog = 20 + ((i / arancelesDL.length) * 70);
+                    mostrarProgreso(`Procesando: ${arancel.nombre}`, prog);
+
+                    // Guardar arancel
+                    const datosArancel = {
+                        id_arancel: arancel.id,
+                        id_plataforma: idPlat,
+                        nombre: arancel.nombre,
+                        habilitado: true
+                    };
+
+                    await fetch(`${SUPABASE_URL}/aranceles`, {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify(datosArancel)
+                    }).catch(async () => {
+                        await fetch(`${SUPABASE_URL}/aranceles?id_arancel=eq.${arancel.id}`, {
+                            method: 'PATCH',
+                            headers,
+                            body: JSON.stringify(datosArancel)
+                        });
+                    });
+
+                    // NIVEL 2: Categorías
+                    const resCat = await fetch(`${DENTALINK_API}/aranceles/${arancel.id}/categorias`, {
+                        headers: { 'Authorization': `Token ${token}`, 'Content-Type': 'application/json' }
+                    });
+
+                    if (!resCat.ok) continue;
+                    const dataCat = await resCat.json();
+                    const categoriasArancel = (dataCat.data || []).filter(c => c.habilitado === 1);
+
+                    if (categoriasArancel.length === 0) continue;
+                    totalCat += categoriasArancel.length;
+
+                    // NIVEL 3: Prestaciones por categoría
+                    for (const cat of categoriasArancel) {
+                        const datosCat = {
+                            id_categoria: cat.id,
+                            id_arancel: arancel.id,
+                            nombre: cat.nombre,
+                            id_tipo: cat.id_tipo,
+                            tipo: cat.tipo,
+                            habilitado: true
+                        };
+
+                        await fetch(`${SUPABASE_URL}/categorias`, {
+                            method: 'POST',
+                            headers,
+                            body: JSON.stringify(datosCat)
+                        }).catch(async () => {
+                            await fetch(`${SUPABASE_URL}/categorias?id_categoria=eq.${cat.id}`, {
+                                method: 'PATCH',
+                                headers,
+                                body: JSON.stringify(datosCat)
+                            });
+                        });
+
+                        const resPrest = await fetch(`${DENTALINK_API}/categorias/${cat.id}/prestaciones`, {
+                            headers: { 'Authorization': `Token ${token}`, 'Content-Type': 'application/json' }
+                        });
+
+                        if (!resPrest.ok) continue;
+                        const dataPrest = await resPrest.json();
+                        const prestacionesCat = (dataPrest.data || []).filter(p => p.habilitado === 1);
+                        totalPrest += prestacionesCat.length;
+
+                        for (const prest of prestacionesCat) {
+                            const datosPrest = {
+                                id_prestacion: prest.id,
+                                id_categoria: cat.id,
+                                id_arancel: arancel.id,
+                                nombre: prest.nombre,
+                                codigo: prest.codigo || null,
+                                precio: prest.precio || 0,
+                                habilitado: true,
+                                nombre_categoria: prest.nombre_categoria || cat.nombre,
+                                nombre_arancel: prest.nombre_arancel || arancel.nombre,
+                                tipo: prest.tipo || cat.tipo
+                            };
+
+                            await fetch(`${SUPABASE_URL}/prestaciones`, {
+                                method: 'POST',
+                                headers,
+                                body: JSON.stringify(datosPrest)
+                            }).catch(async () => {
+                                await fetch(`${SUPABASE_URL}/prestaciones?id_prestacion=eq.${prest.id}`, {
+                                    method: 'PATCH',
+                                    headers,
+                                    body: JSON.stringify(datosPrest)
+                                });
+                            });
+                        }
+                    }
+
+                    mostrarProgreso('', prog, `${arancel.nombre}: ${categoriasArancel.length} categorías`);
+                }
+
+                mostrarProgreso('Finalizando...', 95);
+                await cargarDatos();
+                ocultarProgreso();
+                mostrarToast(`✅ Sync: ${arancelesDL.length} aranceles, ${totalCat} categorías, ${totalPrest} prestaciones`, 'success');
+
+            } catch (error) {
+                console.error('Error:', error);
+                ocultarProgreso();
+                mostrarToast(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // SINCRONIZAR SUCURSALES
+        async function sincronizarSucursales() {
+            const plat = plataformas.find(p => p.activa);
+            if (!plat) {
+                mostrarToast('Configura token primero', 'error');
+                return;
+            }
+
+            const icon = document.getElementById('iconSyncSucursales');
+            icon.classList.add('fa-spin');
+
+            try {
+                const res = await fetch(`${DENTALINK_API}/sucursales`, {
+                    headers: { 'Authorization': `Token ${plat.token}`, 'Content-Type': 'application/json' }
+                });
+                if (!res.ok) throw new Error('Error API');
+
+                const data = await res.json();
+                const sucsDL = data.data || [];
+                let nuevas = 0, actualizadas = 0;
+
+                for (const suc of sucsDL) {
+                    const existe = sucursales.find(s => s.id_sucursal === suc.id);
+                    const datos = {
+                        id_sucursal: suc.id,
+                        nombre_sucursal: suc.nombre,
+                        ciudad: suc.ciudad || suc.comuna || 'Sin ciudad',
+                        direccion: suc.direccion,
+                        telefono: suc.telefono,
+                        activa: suc.habilitada === 1
+                    };
+
+                    if (!existe) {
+                        datos.horarios = null;
+                        await fetch(`${SUPABASE_URL}/sucursales`, {
+                            method: 'POST',
+                            headers,
+                            body: JSON.stringify(datos)
+                        });
+                        nuevas++;
+                    } else {
+                        await fetch(`${SUPABASE_URL}/sucursales?id_sucursal=eq.${suc.id}`, {
+                            method: 'PATCH',
+                            headers,
+                            body: JSON.stringify(datos)
+                        });
+                        actualizadas++;
+                    }
+                }
+
+                await cargarDatos();
+                icon.classList.remove('fa-spin');
+                mostrarToast(`Sync: ${nuevas} nuevas, ${actualizadas} actualizadas`, 'success');
+
+            } catch (error) {
+                icon.classList.remove('fa-spin');
+                mostrarToast(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // RENDERIZADOS
+        function renderizarTablaPlataformas() {
+            const tbody = document.getElementById('tablaPlataformas');
+            if (plataformas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No hay plataformas</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = plataformas.map(p => `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 text-sm font-bold text-blue-600">${p.id_plataforma}</td>
+                    <td class="px-6 py-4 text-sm font-medium">${p.zona}</td>
+                    <td class="px-6 py-4 text-xs text-gray-500 font-mono">${p.token.substring(0, 20)}...</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs rounded-full ${p.activa ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                            ${p.activa ? '✓ Activa' : '✗ Inactiva'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 flex gap-2">
+                        <button onclick="editarPlataforma(${p.id_plataforma})" class="text-blue-600 hover:text-blue-800" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="eliminarPlataforma(${p.id_plataforma})" class="text-red-600 hover:text-red-800" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderizarTablaSucursales() {
+            const tbody = document.getElementById('tablaSucursales');
+            if (sucursales.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">No hay sucursales</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = sucursales.map(s => `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 text-sm font-bold text-blue-600">${s.id_sucursal}</td>
+                    <td class="px-6 py-4 text-sm font-medium">${s.nombre_sucursal}</td>
+                    <td class="px-6 py-4 text-sm">${s.ciudad || '-'}</td>
+                    <td class="px-6 py-4 text-sm">${s.telefono || '-'}</td>
+                    <td class="px-6 py-4 text-xs">${s.horarios ? s.horarios.substring(0, 30) : '⚠️ Sin horario'}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs rounded-full ${s.activa !== false ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                            ${s.activa !== false ? '✓ Activa' : '✗ Inactiva'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <button onclick="editarHorarioSucursal(${s.id_sucursal})" class="text-blue-600 hover:text-blue-800" title="Editar horarios">
+                            <i class="fas fa-clock"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function aplicarFiltrosPrestaciones() {
+            const arancel = document.getElementById('filtroArancel')?.value || '';
+            const categoria = document.getElementById('filtroCategoria')?.value || '';
+            const tipo = document.getElementById('filtroTipo')?.value || '';
+            const busqueda = document.getElementById('buscarPrestacion')?.value.toLowerCase() || '';
+
+            prestacionesFiltradas = prestaciones.filter(p => {
+                if (arancel && p.id_arancel != arancel) return false;
+                if (categoria && p.id_categoria != categoria) return false;
+                if (tipo && p.tipo !== tipo) return false;
+                if (busqueda && !p.nombre.toLowerCase().includes(busqueda)) return false;
+                return true;
+            });
+        }
+
+        function renderizarTablaPrestaciones() {
+            const tbody = document.getElementById('tablaPrestaciones');
+            if (prestacionesFiltradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No hay prestaciones</td></tr>';
+                document.getElementById('infoPrestaciones').textContent = '';
+                document.getElementById('paginacionPrestaciones').innerHTML = '';
+                return;
+            }
+
+            const totalPag = Math.ceil(prestacionesFiltradas.length / itemsPorPagina);
+            const inicio = (paginaActual - 1) * itemsPorPagina;
+            const fin = inicio + itemsPorPagina;
+            const prestPagina = prestacionesFiltradas.slice(inicio, fin);
+
+            tbody.innerHTML = prestPagina.map(p => `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 text-sm">${p.nombre.substring(0, 50)}${p.nombre.length > 50 ? '...' : ''}</td>
+                    <td class="px-4 py-3 text-xs">${p.nombre_categoria || '-'}</td>
+                    <td class="px-4 py-3 text-xs">${p.tipo || '-'}</td>
+                    <td class="px-4 py-3 text-sm font-bold text-green-600">$${Number(p.precio).toFixed(2)}</td>
+                    <td class="px-4 py-3 text-xs">${p.nombre_arancel || '-'}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('infoPrestaciones').textContent = 
+                `Mostrando ${inicio + 1} - ${Math.min(fin, prestacionesFiltradas.length)} de ${prestacionesFiltradas.length}`;
+
+            let paginacionHTML = '';
+            if (paginaActual > 1) {
+                paginacionHTML += `<button onclick="cambiarPagina(${paginaActual - 1})" class="px-3 py-1 border rounded hover:bg-gray-100">Anterior</button>`;
+            }
+            for (let i = Math.max(1, paginaActual - 2); i <= Math.min(totalPag, paginaActual + 2); i++) {
+                paginacionHTML += `<button onclick="cambiarPagina(${i})" class="px-3 py-1 border rounded ${i === paginaActual ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}">${i}</button>`;
+            }
+            if (paginaActual < totalPag) {
+                paginacionHTML += `<button onclick="cambiarPagina(${paginaActual + 1})" class="px-3 py-1 border rounded hover:bg-gray-100">Siguiente</button>`;
+            }
+            document.getElementById('paginacionPrestaciones').innerHTML = paginacionHTML;
+        }
+
+        function cambiarPagina(pagina) {
+            paginaActual = pagina;
+            renderizarTablaPrestaciones();
+        }
+
+        function filtrarPrestaciones() {
+            aplicarFiltrosPrestaciones();
+            paginaActual = 1;
+            renderizarTablaPrestaciones();
+        }
+
+        function renderizarResumen() {
+            const tbody = document.getElementById('tablaResumen');
+            if (aranceles.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">No hay datos</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = aranceles.map(a => {
+                const cats = categorias.filter(c => c.id_arancel === a.id_arancel).length;
+                const prests = prestaciones.filter(p => p.id_arancel === a.id_arancel).length;
+                const sucs = arancelSucursal.filter(as => as.id_arancel === a.id_arancel).length;
+
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm font-medium">${a.nombre}</td>
+                        <td class="px-6 py-4 text-sm font-bold text-purple-600">${cats}</td>
+                        <td class="px-6 py-4 text-sm font-bold text-blue-600">${prests}</td>
+                        <td class="px-6 py-4 text-sm font-bold text-green-600">${sucs}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function llenarFiltrosPromociones() {
+            const filtroA = document.getElementById('filtroArancel');
+            const filtroC = document.getElementById('filtroCategoria');
+            const filtroT = document.getElementById('filtroTipo');
+
+            if (filtroA) {
+                filtroA.innerHTML = '<option value="">Todos los aranceles</option>' + 
+                    aranceles.map(a => `<option value="${a.id_arancel}">${a.nombre}</option>`).join('');
+            }
+            if (filtroC) {
+                filtroC.innerHTML = '<option value="">Todas las categorías</option>' + 
+                    [...new Set(categorias.map(c => c.nombre))].map(n => `<option value="${n}">${n}</option>`).join('');
+            }
+            if (filtroT) {
+                filtroT.innerHTML = '<option value="">Todos los tipos</option>' + 
+                    [...new Set(categorias.map(c => c.tipo))].filter(t => t).map(t => `<option value="${t}">${t}</option>`).join('');
+            }
+        }
+
+        function llenarSelectPlataformas() {
+            const select = document.getElementById('filtroPlataformaAranceles');
+            if (select) {
+                select.innerHTML = '<option value="">Selecciona una plataforma...</option>' +
+                    plataformas.filter(p => p.activa).map(p => `<option value="${p.id_plataforma}">${p.zona}</option>`).join('');
+            }
+        }
+
+        async function cargarAranceles() {
+            const idPlat = document.getElementById('filtroPlataformaAranceles').value;
+            const contenedor = document.getElementById('contenedorAranceles');
+
+            if (!idPlat) {
+                contenedor.innerHTML = '<p class="text-gray-500 text-center py-8">Selecciona una plataforma</p>';
+                return;
+            }
+
+            const arancelesPlat = aranceles.filter(a => a.id_plataforma == idPlat);
+            if (arancelesPlat.length === 0) {
+                contenedor.innerHTML = '<p class="text-gray-500 text-center py-8">No hay aranceles. Sincroniza primero.</p>';
+                return;
+            }
+
+            contenedor.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    ${arancelesPlat.map(a => {
+                        const cats = categorias.filter(c => c.id_arancel === a.id_arancel).length;
+                        const prests = prestaciones.filter(p => p.id_arancel === a.id_arancel).length;
+                        const sucs = arancelSucursal.filter(as => as.id_arancel === a.id_arancel).length;
+
+                        return `
+                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                            <h4 class="font-bold text-gray-800 text-lg mb-2">${a.nombre}</h4>
+                            <div class="space-y-1 text-sm text-gray-600">
+                                <p><i class="fas fa-folder text-purple-500 mr-2"></i>${cats} categorías</p>
+                                <p><i class="fas fa-tags text-blue-500 mr-2"></i>${prests} prestaciones</p>
+                                <p><i class="fas fa-building text-green-500 mr-2"></i>${sucs} sucursales</p>
+                            </div>
+                        </div>
+                    `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        // MODALES
+        function mostrarFormNuevaPlataforma() {
+            document.getElementById('tituloModalPlataforma').textContent = '➕ Nueva Plataforma';
+            document.getElementById('idPlataformaEditar').value = '';
+            document.getElementById('formPlataforma').reset();
+            document.getElementById('modalPlataforma').classList.remove('hidden');
+        }
+
+        function cerrarModalPlataforma() {
+            document.getElementById('modalPlataforma').classList.add('hidden');
+        }
+
+        function editarPlataforma(id) {
+            const p = plataformas.find(pl => pl.id_plataforma === id);
+            if (!p) return;
+            document.getElementById('tituloModalPlataforma').textContent = '✏️ Editar Plataforma';
+            document.getElementById('idPlataformaEditar').value = p.id_plataforma;
+            document.getElementById('zonaPlataforma').value = p.zona;
+            document.getElementById('tokenPlataforma').value = p.token;
+            document.getElementById('activaPlataforma').value = p.activa.toString();
+            document.getElementById('modalPlataforma').classList.remove('hidden');
+        }
+
+        async function guardarPlataforma(event) {
+            event.preventDefault();
+            const idEdit = document.getElementById('idPlataformaEditar').value;
+            const datos = {
+                zona: document.getElementById('zonaPlataforma').value,
+                token: document.getElementById('tokenPlataforma').value,
+                activa: document.getElementById('activaPlataforma').value === 'true'
+            };
+
+            try {
+                if (idEdit) {
+                    await fetch(`${SUPABASE_URL}/plataformas?id_plataforma=eq.${idEdit}`, {
+                        method: 'PATCH',
+                        headers,
+                        body: JSON.stringify(datos)
+                    });
+                    mostrarToast('Plataforma actualizada', 'success');
+                } else {
+                    await fetch(`${SUPABASE_URL}/plataformas`, {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify(datos)
+                    });
+                    mostrarToast('Plataforma creada', 'success');
+                }
+                cerrarModalPlataforma();
+                await cargarDatos();
+            } catch (error) {
+                mostrarToast('Error al guardar', 'error');
+            }
+        }
+
+        async function eliminarPlataforma(id) {
+            if (!confirm('⚠️ ¿Eliminar plataforma?')) return;
+            try {
+                await fetch(`${SUPABASE_URL}/plataformas?id_plataforma=eq.${id}`, {
+                    method: 'DELETE',
+                    headers
+                });
+                mostrarToast('Plataforma eliminada', 'success');
+                await cargarDatos();
+            } catch (error) {
+                mostrarToast('Error al eliminar', 'error');
+            }
+        }
+
+        function editarHorarioSucursal(id) {
+            const s = sucursales.find(suc => suc.id_sucursal === id);
+            if (!s) return;
+            document.getElementById('idSucursalEditar').value = s.id_sucursal;
+            document.getElementById('nombreSucursalModal').textContent = s.nombre_sucursal;
+            document.getElementById('ciudadSucursalModal').textContent = s.ciudad || 'Sin ciudad';
+            document.getElementById('horariosSucursal').value = s.horarios || '';
+            document.getElementById('modalSucursal').classList.remove('hidden');
+        }
+
+        function cerrarModalSucursal() {
+            document.getElementById('modalSucursal').classList.add('hidden');
+        }
+
+        async function guardarHorarioSucursal(event) {
+            event.preventDefault();
+            const id = document.getElementById('idSucursalEditar').value;
+            const horarios = document.getElementById('horariosSucursal').value || null;
+
+            try {
+                await fetch(`${SUPABASE_URL}/sucursales?id_sucursal=eq.${id}`, {
+                    method: 'PATCH',
+                    headers,
+                    body: JSON.stringify({ horarios })
+                });
+                mostrarToast('Horarios actualizados', 'success');
+                cerrarModalSucursal();
+                await cargarDatos();
+            } catch (error) {
+                mostrarToast('Error al guardar', 'error');
+            }
+        }
+    </script>
+</body>
+</html>
